@@ -2,7 +2,9 @@ var selfEasyrtcid = "";
 
 
 function connect() {
-    easyrtc.setVideoDims(1280,720);
+    var width = (window.innerWidth > 0) ? window.innerWidth : screen.width;
+    var height = (window.innerHeight > 0) ? window.innerHeight : screen.height;
+    easyrtc.setVideoDims(720,720);
     easyrtc.setRoomOccupantListener(convertListToButtons);
     easyrtc.easyApp("easyrtc.audioVideoSimple", "selfVideo", ["callerVideo"], loginSuccess, loginFailure);
  }
