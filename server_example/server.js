@@ -18,8 +18,8 @@ var ssl = {
     key:  fs.readFileSync("./key.pem"),
     cert: fs.readFileSync("./cert.pem")
 }
-var webServer = https.createServer(ssl, app);
-
+var webServer = https.createServer(ssl,app);
+//var webServer = http.createServer(app);
 // Start Socket.io so it attaches itself to Express server
 var socketServer = socketIo.listen(webServer, {"log level":1});
 
@@ -58,7 +58,10 @@ var rtc = easyrtc.listen(app, socketServer, null, function(err, rtcRef) {
     });
 });
 
-//listen on port 8080
+//listen on port 8443
 webServer.listen(8443, function () {
     console.log('listening on http://localhost:8443');
 });
+// webServer.listen(8080, function () {
+//     console.log('listening on http://localhost:8080');
+// });

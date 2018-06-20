@@ -27,7 +27,7 @@ var selfEasyrtcid = "";
 
 
 function connect() {
-    easyrtc.setVideoDims(1280,720);
+    easyrtc.setVideoDims(1024,768);
     easyrtc.enableDebug(false);
     easyrtc.setRoomOccupantListener(convertListToButtons);
     easyrtc.easyApp("easyrtc.videoChatHd", "selfVideo", ["callerVideo"], loginSuccess, loginFailure);
