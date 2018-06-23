@@ -39,6 +39,7 @@ function ApplicationController(uku) {
             console.log('PeerClosed');
             self.hasInvite = false;
             self.inMeeting = false;
+            self.waitingJoin = true;
             self.canInvite = true;
             uku.refresh('appCtrl');
         });
@@ -50,6 +51,7 @@ function ApplicationController(uku) {
         // }
         acceptorHandler(true);  
         this.hasInvite = false;
+        this.waitingJoin = false;
         this.inMeeting = true;
         //uku.refresh('appCtrl');
     };
