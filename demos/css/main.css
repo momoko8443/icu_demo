@@ -1,0 +1,104 @@
+html, body{ margin:0; height:100%; }
+div{
+    /* border: 1px red solid; */
+    box-sizing: border-box;
+}
+
+video{
+    border: 1px #9e9e9e solid;
+    box-sizing: border-box;
+}
+.container{
+    width: 100%;
+    height: 100%;
+}
+
+.main{
+    height: 100%;
+    padding: 2em;
+}
+.sub{
+    height: 100%;
+}
+.self{
+    height: 40%;
+    padding: 2em;
+}
+.console{
+    height: 60%;
+    padding: 2em;
+    color: white;
+    font-weight: 300;
+    color: rgb(176, 202, 219);
+    text-align: center;
+}
+
+@media screen and (orientation: portrait) {
+/*竖屏 css*/
+    .main{
+        height: 60%;
+        padding: 2em;
+        position: relative;
+    }
+    .sub{
+        height: 40%;
+        background: rgb(61, 79, 93);
+    }
+    .self{
+        height: 100%;
+        padding: 2em;
+        position: relative;
+    }
+    .console{
+        height: 100%;
+        padding: 2em;
+        color: white;
+        font-weight: 300;
+        color: rgb(176, 202, 219);
+        text-align: center;
+    }
+    .height100{
+        height: 100%;
+    }
+} 
+@media screen and (orientation: landscape) {
+/*横屏 css*/
+    .main{
+        height: 100%;
+        position: relative;
+    }
+    .sub{
+        height: 100%;
+        background: rgb(61, 79, 93);
+    }
+    .self{
+        height: 40%;
+        padding: 2em;
+        position: relative;
+    }
+    .console{
+        height: 60%;
+        font-weight: 300;
+        color: rgb(176, 202, 219);
+    }
+    .height100{
+        height: 100%;
+    }
+}
+
+.content-subhead{
+    text-transform: uppercase;
+    color: #aaa;
+    /* border-bottom: 1px solid #eee; */
+    padding: 0.4em 0;
+    font-size: 80%;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+}
+
+.waiting{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
