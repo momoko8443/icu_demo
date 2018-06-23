@@ -28,7 +28,6 @@
   "dependencies": {
     "async": "0.2.x",
     "colors": "*",
-    "purecss": "^1.0.0",
     "underscore": "1.5.x"
   },
   "scripts": {
