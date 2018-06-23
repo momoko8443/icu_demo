@@ -36,6 +36,9 @@
                     <video autoplay="autoplay" playsinline="playsinline" style="height: 100%;width: 100%" id="selfVideo" muted="muted" volume="0"></video>
                 </div>
                 <div class="pure-u-1-2 pure-u-md-1 console" uku-render="appCtrl.clientMode === 'active'">
+                    <div uku-render="!appCtrl.isFullScreen">
+                        <a class="pure-button pure-button-primary" href="#" uku-onclick="appCtrl.fullScreen()">全屏模式</a>
+                    </div>
                     <div uku-render="appCtrl.canInvite">
                         <h2 class="post-title">{{appCtrl.otherClientName}}</h2>
                         <a class="pure-button pure-button-primary" href="#" uku-onclick="appCtrl.call()">呼叫</a>
@@ -47,22 +50,26 @@
                     </div>
                 </div>
                 <div class="pure-u-1-2 pure-u-md-1 console" uku-render="appCtrl.clientMode === 'passive'">
-                        <div uku-render="appCtrl.hasInvite">
-                            <h2 class="post-title">{{'来自 ' + appCtrl.callerName +' 的通话邀请'}}</h2>
-                            <a class="pure-button pure-button-primary" href="#" uku-onclick="appCtrl.accept()">接受</a>
-                        </div>
-                        <div uku-render="appCtrl.inMeeting">
-                            <h2 class="post-title">通话时间</h2>
-                            <h2 class="post-title">{{appCtrl.time}}</h2>
-                            <a class="pure-button pure-button-primary" href="#" uku-onclick="appCtrl.hangUp()">挂断</a>
-                        </div>
+                    <div uku-render="!appCtrl.isFullScreen">
+                        <a class="pure-button pure-button-primary" href="#" uku-onclick="appCtrl.fullScreen()">全屏模式</a>
                     </div>
+                    <div uku-render="appCtrl.hasInvite">
+                        <h2 class="post-title">{{'来自 ' + appCtrl.callerName +' 的通话邀请'}}</h2>
+                        <a class="pure-button pure-button-primary" href="#" uku-onclick="appCtrl.accept()">接受</a>
+                    </div>
+                    <div uku-render="appCtrl.inMeeting">
+                        <h2 class="post-title">通话时间</h2>
+                        <h2 class="post-title">{{appCtrl.time}}</h2>
+                        <a class="pure-button pure-button-primary" href="#" uku-onclick="appCtrl.hangUp()">挂断</a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </body>
 <script src="/socket.io/socket.io.js"></script>
 <script type="text/javascript" src="/easyrtc/easyrtc.js"></script>
-<script type="text/javascript" src="js/ukulele/uku.js" ></script>
+<script type="text/javascript" src="js/ukulele/uku.js"></script>
 <script type="text/javascript" src="js/main.js"></script>
+
 </html>

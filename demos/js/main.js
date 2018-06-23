@@ -14,12 +14,20 @@ function ApplicationController(uku) {
     this.hasInvite = false;
     this.inMeeting = false;
     this.time = "00:00";
+    this.isFullScreen = false;
     var isOccupy = false;
     var selfEasyrtcid = "";
     var callerId = "";
     var self = this;
     var acceptorHandler;
+    this.fullScreen = function(){
+        document.documentElement.webkitRequestFullScreen();
+    }
     this.init = function(){
+        document.addEventListener('webkitfullscreenchange', function(){ 
+            self.isFullScreen = !self.isFullScreen;
+            uku.refresh('appCtrl');
+        });
         this.clientMode = getClientMode();
         uku.refresh('appCtrl');
         easyrtc.setVideoDims(720,720);
