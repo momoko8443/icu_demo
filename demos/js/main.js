@@ -23,6 +23,7 @@ function ApplicationController(uku) {
     this.fullScreen = function(){
         document.documentElement.webkitRequestFullScreen();
     }
+    
     this.init = function(){
         document.addEventListener('webkitfullscreenchange', function(){ 
             self.isFullScreen = !self.isFullScreen;

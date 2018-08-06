@@ -6,13 +6,29 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>DEMO for ICU</title>
     <link rel="stylesheet" href="demos/css/purecss/pure-min.css">
+    <script src="demos/js/ukulele/uku.js"></script>
 </head>
-<body style="height: 100%;">
-    <div style="height: 100%;">
-        <div style="position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);">
-            <a class="pure-button pure-button-primary" href="demos/main.html?mode=passive">病房端</a>
-            <a class="pure-button pure-button-primary" href="demos/main.html?mode=active">探视端</a>
-        </div>
-    </div>
+<body uku-application style="height: 100%;">
+    <!-- <welcome></welcome> -->
+    <!-- <setting-one></setting-one> -->
+    <login></login>
 </body>
+<script>
+    var uku = new Ukulele();
+    var appCtrl = new ApplicationController(uku);
+    uku.registerComponent('welcome','demos/components/welcome.html');
+    uku.registerComponent('login','demos/components/login.html');
+    uku.registerComponent('setting-one','demos/components/setting-one.html');
+    uku.registerController('appCtrl', appCtrl);
+    uku.init();
+    uku.addListener(Ukulele.INITIALIZED, function () {
+        appCtrl.init();
+    });
+
+    function ApplicationController(uku) {
+        this.init = function(){
+
+        }
+    }
+</script>
 </html>
