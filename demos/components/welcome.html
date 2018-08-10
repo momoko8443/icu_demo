@@ -5,11 +5,20 @@
                     <div id="bg"></div>
                     <h1>ICU视频探视系统</h1>
                     <h4>上海市第一人民医院松江分院</h4>
-                    <a class="center pure-button pure-button-primary button-xlarge">初始设置</a>
+                    <a class="center pure-button pure-button-primary button-xlarge" uku-onclick="cc.enter()">进入</a>
                 </div>
                 
             </div>
         </template>
+        <script>
+            (function(){
+                return function(uku){
+                    this.enter = function(){
+                        this.fire('enter_event');
+                    };
+                };
+            })();
+        </script>
         <style>
             h1{
                 color: #eae3e3;
@@ -28,16 +37,17 @@
             h4{
                 color: white;
                 position: absolute;
-                top: 90%;
+                bottom: 0;
                 left: 50%;
                 transform: translate(-50%, -50%);
+                margin-bottom: 5px;
             }
             .button-xlarge {
                 font-size: 125%;
             }
             #bg{
                 width: 1000px;
-                height: 400px;
+                height: 300px;
                 background-position:center;
                 background-repeat: no-repeat;
                 background-image: url("demos/images/icu/hospital.jpeg");

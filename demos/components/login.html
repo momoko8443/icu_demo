@@ -7,20 +7,66 @@
                         <form class="pure-form">
                             <fieldset>
                                 <legend>请输入管理员密码</legend>
-                                <input type="email" placeholder="用户名">
-                                <input type="password" placeholder="密码">
-                                <button type="submit" class="pure-button pure-button-primary">登录</button>
+                                <input type="text" uku-value="cc.username" placeholder="用户名" uku-onfocus="cc.hiddenErrorMsg()">
+                                <input type="password" uku-value="cc.password" placeholder="密码" uku-onfocus="cc.hiddenErrorMsg()">
+                                <button type="button" class="pure-button pure-button-primary"  uku-disabled="cc.username =='' || cc.password == '' " uku-onclick="cc.login()">登录</button>
                             </fieldset>
+                            <span id="loginErrorMsg" class="errorMsg">
+                                登录失败，用户名密码错误
+                            </span>
                         </form>
-                    </div>
-                    
+                    </div>  
                 </div>
-                
             </div>
         </template>
+        <script>
+            (function(ajax, jq){
+                return function(uku){
+                    this.disabled = true;
+                    this.username = 'admin';
+                    this.password = 'P@ssw0rd';
+                    var self = this;
+                    var errMsg = jq('#loginErrorMsg');
+
+                    this.hiddenErrorMsg = function(){
+                        if(errMsg.is(':visible')){
+                            errMsg.animateCss('fadeOut', function(){
+                                errMsg.hide();
+                            });
+                        }
+                    };
+                    this.login = function(){
+                        //this.fire('login_event');
+                        if(this.username && this.password){
+                            ajax.post('/authentication', {
+                                username: this.username,
+                                password: this.password
+                            })
+                            .then(function (response) {
+                                //console.log(response);
+                                self.fire('login_success_event');
+                            })
+                            .catch(function (error) {
+                                //console.log(error);
+                                errMsg.show();
+                                errMsg.animateCss('fadeIn');
+                            });
+                        }
+                    };
+                };
+            })(axios, $);
+        </script>
         <style>
             legend{
                 color:white;
+            }
+
+            .errorMsg{
+                background: red;
+                color: white;
+                padding: 5px 10px;
+                border-radius: 5px;
+                display: none;
             }
             
             .center{

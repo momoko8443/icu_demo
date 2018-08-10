@@ -1,0 +1,113 @@
+<uku-component>
+        <template>
+            <div style="height: 100%;">
+                <div class="center">
+                    <div id="bg"></div>
+                    <div class="center">
+                        <form class="pure-form">
+                            <fieldset>
+                                <legend>终端名</legend>
+                                <input type="text" uku-value="cc.alias" placeholder="请为终端起名">
+                            </fieldset>
+                            <fieldset>
+                                <legend>选择频道</legend>
+                                <select style="width: 190px;" uku-selected="cc.selectedChannel|name">
+                                    <option uku-repeat="channel in cc.availableChannels" uku-value="channel.name" uku-data-item="channel">{{channel.displayName}}</option>
+                                </select>
+                            </fieldset>
+                            
+                            <fieldset>
+                                <button type="button" class="pure-button pure-button-primary" style="margin-right: 50px" uku-onclick="cc.save()">进入频道</a>
+                                <button type="button" class="pure-button">取消</a>
+                            </fieldset>
+                        </form>
+                    </div>
+                </div> 
+            </div>
+        </template>
+        <script>
+            (function(ajax, jq){
+                return function(uku){
+                    this.channels = [];
+                    this.availableChannels = [];
+                    this.selectedChannel = {};
+                    this.alias = '';
+                    if(localStorage.getItem('peer')){
+                        this.alias = JSON.parse(localStorage.getItem('peer')).alias;
+                    }
+                    var self = this;
+                    this.init = function(){
+                        getChannels();
+                    }
+
+                    this.save = function(){
+                        var channelId = this.selectedChannel.id;
+                        if(this.alias && this.selectedChannel){
+                            ajax.post('/api/channels/'+ channelId + '/peers',{alias: this.alias})
+                            .then(function(res){
+                                var peer = res.data;
+                                localStorage.setItem('peer',JSON.stringify(peer));
+                            })
+                            .catch(function(err){
+                                console.log(err);
+                            })
+                        }else{
+                            alert('信息不完整');
+                        }
+                    }
+
+                    function getChannels(){
+                        ajax.get('/api/channels')
+                        .then(function(res){
+                            //console.log(res);
+                            self.channels = res.data;
+                            self.availableChannels = wrapChannels(self.channels);
+                            self.selectedChannel = self.availableChannels[0];
+                            uku.refresh();
+                        })
+                        .catch(function(err){
+                            console.log(err);
+                        })
+                    }
+
+                    function wrapChannels(channels){
+                        var tmpArray = [];
+                        for (let index = 0; index < channels.length; index++) {
+                            const channel = channels[index];
+                            if(channel.peers && channel.peers.length < 2){
+                                var copyChannel = JSON.parse(JSON.stringify(channel));
+                                copyChannel.displayName = copyChannel.name + ' (' +  copyChannel.peers.length + '/2)';
+                                tmpArray.push(copyChannel);
+                            }
+                        }
+                        return tmpArray;
+                    }
+                };
+            })(axios, $);
+        </script>
+        <style>
+            legend{
+                color:#795548;
+            }
+            
+            .center{
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+
+            .button-xlarge {
+                font-size: 125%;
+            }
+            #bg{
+                width: 1000px;
+                height: 400px;
+                background-position:center;
+                background-repeat: no-repeat;
+                background-image: url("demos/images/icu/hospital.jpeg");
+                -webkit-filter: blur(3px);
+                filter: blur(3px);
+            }
+        </style>
+    </uku-component>

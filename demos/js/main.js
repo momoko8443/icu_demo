@@ -34,6 +34,11 @@ function ApplicationController(uku) {
         easyrtc.setVideoDims(720,720);
         easyrtc.setRoomOccupantListener(roomOccupantHandler);
         easyrtc.easyApp("easyrtc.audioVideoSimple", "selfVideo", ["callerVideo"], loginSuccess, loginFailure);
+        easyrtc.joinRoom('c1', null, function successCB(){
+            console.log('join room success');
+        }, function failureCB(err){
+            console.log('join room falied', err);
+        });
         easyrtc.setUsername(this.clientMode);
         easyrtc.setAcceptChecker(function(easyrtcid, acceptor){
             if(self.clientMode === 'passive'){
