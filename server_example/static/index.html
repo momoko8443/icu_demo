@@ -6,19 +6,39 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>DEMO for ICU</title>
     <link rel="stylesheet" href="demos/css/purecss/pure-min.css">
+    <link rel="stylesheet" href="demos/css/animate/animate.css">
+    <script src="demos/js/uku-routejs/build/js/uku-route.js"></script>
     <script src="demos/js/ukulele/uku.js"></script>
+    <script src="demos/js/jquery/jquery-3.3.1.min.js"></script>
+    <script src="demos/js/jq.animate.plugin.js"></script>
+    <script src="demos/js/axios/axios.min.js"></script>
 </head>
-<body uku-application style="height: 100%;">
-    <!-- <welcome></welcome> -->
+<body uku-application style="height: 100%;background-color: darkslategrey;">
+    <welcome id="welcome" uku-visible="appCtrl.currentStage === 'welcome'"></welcome>
     <!-- <setting-one></setting-one> -->
-    <login></login>
+    <login id="login" uku-visible="appCtrl.currentStage === 'login'"></login>
+    <!-- <div id="viewContainer"></div> -->
+    <exit-channel id="exitChannel" uku-peer="appCtrl.peer" uku-visible="appCtrl.currentStage === 'exitChannel'"></exit-channel>
+    <choose-channel id="chooseChannel" uku-visible="appCtrl.currentStage === 'chooseChannel'"></choose-channel>
 </body>
 <script>
+    // var route = new RouteController("viewContainer");
+    // route.default("#home", "pages/home.html")
+    // .when("#guide", "pages/guide.html")
+    // .when("#example", "pages/example.html")
+    // .when("#performance", "pages/performance.html")
+    // .when("#api", "pages/api.html")
+    // .when("#showcase", "pages/showcase.html")
+    // .when("#about", "pages/about.html")
+    // .otherwise("pages/home.html")
+    // .addAnchor("repeat");
+
     var uku = new Ukulele();
     var appCtrl = new ApplicationController(uku);
     uku.registerComponent('welcome','demos/components/welcome.html');
     uku.registerComponent('login','demos/components/login.html');
-    uku.registerComponent('setting-one','demos/components/setting-one.html');
+    uku.registerComponent('choose-channel','demos/components/chooseChannel.html');
+    uku.registerComponent('exit-channel','demos/components/exitChannel.html');
     uku.registerController('appCtrl', appCtrl);
     uku.init();
     uku.addListener(Ukulele.INITIALIZED, function () {
@@ -26,8 +46,46 @@
     });
 
     function ApplicationController(uku) {
+        var self = this;
+        this.currentStage = "welcome";
+        this.peer = {};
+        var isRegister = false;
         this.init = function(){
+            if(localStorage.getItem('peer')){
+                isRegister = true;
+                this.peer = JSON.parse(localStorage.getItem('peer'));
+            }
 
+            var welcomePage = document.getElementById('welcome');
+            var loginPage = document.getElementById('login');
+            var chooseChannelPage = document.getElementById('chooseChannel');
+            var exitChannelPage = document.getElementById('exitChannel');
+            welcomePage.addEventListener('enter_event',function(e){
+                $(welcomePage).animateCss('fadeOut', function() {
+                    self.currentStage = "login";
+                    uku.refresh();
+                    $(loginPage).animateCss('fadeIn');
+                });
+            });
+
+            loginPage.addEventListener('login_success_event',function(e){
+                
+                $(loginPage).animateCss('fadeOut', function() {
+                    if(isRegister){
+                        self.currentStage = "exitChannel";
+                        uku.refresh();
+                        $(exitChannelPage).animateCss('fadeIn');
+
+                    }else{
+                        var chooseChannelInstance = uku.getComponentController('chooseChannel');
+                        chooseChannelInstance.init();
+                        self.currentStage = "chooseChannel";
+                        uku.refresh();
+                        $(chooseChannelPage).animateCss('fadeIn');
+                    }
+                    
+                });
+            })
         }
     }
 </script>
