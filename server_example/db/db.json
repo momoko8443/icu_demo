@@ -1,0 +1,57 @@
+{
+  "channels": [
+    {
+      "id": "c1",
+      "name": "Channel 1",
+      "peers": [
+        {
+          "id": "iWRKWYSxF",
+          "alias": "momoko",
+          "channel": {
+            "id": "c1",
+            "name": "Channel 1"
+          }
+        },
+        {
+          "id": "MT43Kt9HJ",
+          "alias": "sakura",
+          "channel": {
+            "id": "c1",
+            "name": "Channel 1"
+          }
+        }
+      ]
+    },
+    {
+      "id": "c2",
+      "name": "Channel 2",
+      "peers": [
+        {
+          "id": "BQ0A7E4UI",
+          "alias": "lowe"
+        }
+      ]
+    },
+    {
+      "id": "c3",
+      "name": "Channel 3",
+      "peers": []
+    },
+    {
+      "id": "c4",
+      "name": "Channel 4",
+      "peers": []
+    },
+    {
+      "id": "c5",
+      "name": "Channel 5",
+      "peers": []
+    }
+  ],
+  "users": [
+    {
+      "username": "admin",
+      "password": "161ebd7d45089b3446ee4e0d86dbcf92"
+    }
+  ]
+}

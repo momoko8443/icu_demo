@@ -7,6 +7,7 @@
     <title>DEMO for ICU</title>
     <link rel="stylesheet" href="demos/css/purecss/pure-min.css">
     <link rel="stylesheet" href="demos/css/animate/animate.css">
+    <script src="demos/js/socket.io/socket.io.min.js"></script>
     <script src="demos/js/uku-routejs/build/js/uku-route.js"></script>
     <script src="demos/js/ukulele/uku.js"></script>
     <script src="demos/js/jquery/jquery-3.3.1.min.js"></script>
@@ -50,10 +51,20 @@
         this.currentStage = "welcome";
         this.peer = {};
         var isRegister = false;
+        var socket;
         this.init = function(){
             if(localStorage.getItem('peer')){
                 isRegister = true;
                 this.peer = JSON.parse(localStorage.getItem('peer'));
+
+                socket = io('https://localhost:8443');
+                socket.on('client_connected', function (data) {
+                    console.log(data);
+                    socket.emit('join_room', { room: self.peer.channel.id });
+                });
+                socket.on('dial', function(data){
+                    console.log('somebody dial me!!!');
+                });
             }
 
             var welcomePage = document.getElementById('welcome');
@@ -61,11 +72,17 @@
             var chooseChannelPage = document.getElementById('chooseChannel');
             var exitChannelPage = document.getElementById('exitChannel');
             welcomePage.addEventListener('enter_event',function(e){
-                $(welcomePage).animateCss('fadeOut', function() {
-                    self.currentStage = "login";
-                    uku.refresh();
-                    $(loginPage).animateCss('fadeIn');
-                });
+                if(isRegister){
+                    if(socket){
+                        socket.emit('dial',{ room: self.peer.channel.id });
+                    }
+                }else{
+                    $(welcomePage).animateCss('fadeOut', function() {
+                        self.currentStage = "login";
+                        uku.refresh();
+                        $(loginPage).animateCss('fadeIn');
+                    });
+                }
             });
 
             loginPage.addEventListener('login_success_event',function(e){
