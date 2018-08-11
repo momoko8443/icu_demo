@@ -6,7 +6,9 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>DEMO for ICU</title>
     <link rel="stylesheet" href="demos/css/purecss/pure-min.css">
+    <link rel="stylesheet" href="demos/css/purecss/grids-responsive-min.css">
     <link rel="stylesheet" href="demos/css/animate/animate.css">
+    <link rel="stylesheet" href="demos/css/main.css">
     <script src="demos/js/socket.io/socket.io.min.js"></script>
     <script src="demos/js/uku-routejs/build/js/uku-route.js"></script>
     <script src="demos/js/ukulele/uku.js"></script>
@@ -15,12 +17,13 @@
     <script src="demos/js/axios/axios.min.js"></script>
 </head>
 <body uku-application style="height: 100%;background-color: darkslategrey;">
-    <welcome id="welcome" uku-visible="appCtrl.currentStage === 'welcome'"></welcome>
+    <welcome id="welcome" uku-render="appCtrl.currentStage === 'welcome'"></welcome>
     <!-- <setting-one></setting-one> -->
-    <login id="login" uku-visible="appCtrl.currentStage === 'login'"></login>
+    <login id="login" uku-render="appCtrl.currentStage === 'login'"></login>
     <!-- <div id="viewContainer"></div> -->
-    <exit-channel id="exitChannel" uku-peer="appCtrl.peer" uku-visible="appCtrl.currentStage === 'exitChannel'"></exit-channel>
-    <choose-channel id="chooseChannel" uku-visible="appCtrl.currentStage === 'chooseChannel'"></choose-channel>
+    <exit-channel id="exitChannel" uku-peer="appCtrl.peer" uku-render="appCtrl.currentStage === 'exitChannel'"></exit-channel>
+    <choose-channel id="chooseChannel" uku-render="appCtrl.currentStage === 'chooseChannel'"></choose-channel>
+    <video-chat id="videoChat" uku-render="appCtrl.currentStage === 'videoChat'"></video-chat>
 </body>
 <script>
     // var route = new RouteController("viewContainer");
@@ -40,6 +43,7 @@
     uku.registerComponent('login','demos/components/login.html');
     uku.registerComponent('choose-channel','demos/components/chooseChannel.html');
     uku.registerComponent('exit-channel','demos/components/exitChannel.html');
+    uku.registerComponent('video-chat','demos/components/videoChat.html');
     uku.registerController('appCtrl', appCtrl);
     uku.init();
     uku.addListener(Ukulele.INITIALIZED, function () {
@@ -71,10 +75,16 @@
             var loginPage = document.getElementById('login');
             var chooseChannelPage = document.getElementById('chooseChannel');
             var exitChannelPage = document.getElementById('exitChannel');
+            var videoChatPage = document.getElementById('videoChat');
             welcomePage.addEventListener('enter_event',function(e){
                 if(isRegister){
                     if(socket){
                         socket.emit('dial',{ room: self.peer.channel.id });
+                        $(welcomePage).animateCss('fadeOut', function() {
+                            self.currentStage = "videoChat";
+                            uku.refresh();
+                            $(videoChatPage).animateCss('fadeIn');
+                        });
                     }
                 }else{
                     $(welcomePage).animateCss('fadeOut', function() {
