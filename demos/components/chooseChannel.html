@@ -7,18 +7,20 @@
                         <form class="pure-form">
                             <fieldset>
                                 <legend>终端名</legend>
-                                <input type="text" uku-value="cc.alias" placeholder="请为终端起名">
+                                <input type="text" uku-value="cc.alias" placeholder="请为终端起名" uku-onchange="cc.hiddenErrorMsg()">
                             </fieldset>
                             <fieldset>
                                 <legend>选择频道</legend>
-                                <select style="width: 190px;" uku-selected="cc.selectedChannel|name">
+                                <select style="width: 190px;" uku-selected="cc.selectedChannel|name" uku-onchange="cc.hiddenErrorMsg()">
                                     <option uku-repeat="channel in cc.availableChannels" uku-value="channel.name" uku-data-item="channel">{{channel.displayName}}</option>
                                 </select>
                             </fieldset>
-                            
+                            <span id="errorMsg" class="errorMsg">
+                                {{cc.errorMsg}}
+                            </span>
                             <fieldset>
                                 <button type="button" class="pure-button pure-button-primary" style="margin-right: 50px" uku-onclick="cc.save()">进入频道</a>
-                                <button type="button" class="pure-button">取消</a>
+                                <button type="button" class="pure-button" uku-onclick="cc.cancel()">取消</a>
                             </fieldset>
                         </form>
                     </div>
@@ -32,10 +34,12 @@
                     this.availableChannels = [];
                     this.selectedChannel = {};
                     this.alias = '';
+                    this.errorMsg = '';
                     if(localStorage.getItem('peer')){
                         this.alias = JSON.parse(localStorage.getItem('peer')).alias;
                     }
                     var self = this;
+                    var errMsg = jq('#errorMsg');
                     this.init = function(){
                         getChannels();
                     }
@@ -47,14 +51,26 @@
                             .then(function(res){
                                 var peer = res.data;
                                 localStorage.setItem('peer',JSON.stringify(peer));
+                                self.fire('settingssaved');
                             })
                             .catch(function(err){
-                                console.log(err);
+                                self.errorMsg = err.message;
+                                uku.refresh();
+                                errMsg.show();
+                                errMsg.animateCss('fadeIn');
                             })
-                        }else{
-                            alert('信息不完整');
                         }
-                    }
+                    };
+                    this.hiddenErrorMsg = function(){
+                        if(errMsg.is(':visible')){
+                            errMsg.animateCss('fadeOut', function(){
+                                errMsg.hide();
+                            });
+                        }
+                    };
+                    this.cancel = function(){
+                        this.fire('cancelchoosechannel');
+                    };
 
                     function getChannels(){
                         ajax.get('/api/channels')
@@ -88,6 +104,14 @@
         <style>
             legend{
                 color:#795548;
+            }
+
+            .errorMsg{
+                background: red;
+                color: white;
+                padding: 5px 10px;
+                border-radius: 5px;
+                display: none;
             }
             
             .center{

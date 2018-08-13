@@ -5,36 +5,15 @@
       "name": "Channel 1",
       "peers": [
         {
-          "id": "iWRKWYSxF",
-          "alias": "momoko",
-          "channel": {
-            "id": "c1",
-            "name": "Channel 1"
-          }
-        },
-        {
-          "id": "MT43Kt9HJ",
-          "alias": "sakura",
-          "channel": {
-            "id": "c1",
-            "name": "Channel 1"
-          }
+          "id": "0s0rK1SED",
+          "alias": "momoko"
         }
       ]
     },
     {
       "id": "c2",
       "name": "Channel 2",
-      "peers": [
-        {
-          "id": "BQ0A7E4UI",
-          "alias": "lowe"
-        },
-        {
-          "id": "QWWQDF6Fl",
-          "alias": "momoko"
-        }
-      ]
+      "peers": []
     },
     {
       "id": "c3",

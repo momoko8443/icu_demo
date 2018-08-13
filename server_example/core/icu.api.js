@@ -65,13 +65,13 @@ app.post('/api/channels/:channelid/peers', function (req, res) {
         } else {
             //peer full
             res.status(500).send({
-                message: "peers full"
+                message: "此频道已满员"
             });
         }
     } else {
         //channel not found
         res.status(404).send({
-            message: "channel not found"
+            message: "频道不存在"
         });
     }
 });
@@ -87,13 +87,13 @@ app.delete('/api/channels/:channelid/peers/:peerid', function (req, res) {
             res.send(200);
         } else {
             res.status(404).send({
-                message: "peer not found"
+                message: "未找到当前终端"
             });
         }
     } else {
         //channel not found
         res.status(404).send({
-            message: "channel not found"
+            message: "频道不存在"
         });
     }
 });

@@ -9,7 +9,10 @@
                                 <legend>请输入管理员密码</legend>
                                 <input type="text" uku-value="cc.username" placeholder="用户名" uku-onfocus="cc.hiddenErrorMsg()">
                                 <input type="password" uku-value="cc.password" placeholder="密码" uku-onfocus="cc.hiddenErrorMsg()">
+                            </fieldset>
+                            <fieldset>
                                 <button type="button" class="pure-button pure-button-primary"  uku-disabled="cc.username =='' || cc.password == '' " uku-onclick="cc.login()">登录</button>
+                                <button type="button" class="pure-button"  uku-onclick="cc.cancel()">取消</button>
                             </fieldset>
                             <span id="loginErrorMsg" class="errorMsg">
                                 登录失败，用户名密码错误
@@ -44,7 +47,7 @@
                             })
                             .then(function (response) {
                                 //console.log(response);
-                                self.fire('login_success_event');
+                                self.fire('loginsuccessevent');
                             })
                             .catch(function (error) {
                                 //console.log(error);
@@ -52,6 +55,9 @@
                                 errMsg.animateCss('fadeIn');
                             });
                         }
+                    };
+                    this.cancel = function(){
+                        this.fire('cancellogin');
                     };
                 };
             })(axios, $);

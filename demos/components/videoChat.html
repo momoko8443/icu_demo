@@ -12,21 +12,21 @@
                         <video autoplay="autoplay" playsinline="playsinline" style="height: 100%;width: 100%" id="selfVideo" muted="muted" volume="0"></video>
                     </div>
                     <div class="pure-u-1-2 pure-u-md-1 console">
-                        <div uku-render="!cc.isFullScreen">
-                            <a class="pure-button pure-button-primary" href="#" uku-onclick="cc.fullScreen()">全屏模式</a>
+                        <div>
+                            <button type="button" class="pure-button pure-button-primary" uku-onclick="cc.exit()">退出</button>
                         </div>
                         <div uku-render="cc.canInvite">
                             <h2 class="post-title">{{cc.otherClientName}}</h2>
-                            <a class="pure-button pure-button-primary" href="#" uku-onclick="cc.call()">呼叫</a>
+                            <button type="button" class="pure-button pure-button-primary" uku-onclick="cc.call()">呼叫</button>
                         </div>
                         <div uku-render="cc.hasInvite">
                             <h2 class="post-title">{{'来自 ' + cc.callerName +' 的通话邀请'}}</h2>
-                            <a class="pure-button pure-button-primary" href="#" uku-onclick="cc.accept()">接受</a>
+                            <button type="button" class="pure-button pure-button-primary" uku-onclick="cc.accept()">接受</button>
                         </div>
                         <div uku-render="cc.inMeeting">
                             <h2 class="post-title">通话时间</h2>
                             <h2 class="post-title">{{cc.time}}</h2>
-                            <a class="pure-button pure-button-primary" href="#" uku-onclick="cc.hangUp()">挂断</a>
+                            <button type="button" class="pure-button pure-button-primary" uku-onclick="cc.hangUp()">挂断</button>
                         </div>
                     </div>
                 </div>
@@ -41,22 +41,22 @@
                 this.hasInvite = false;
                 this.inMeeting = false;
                 this.time = "00:00";
-                this.isFullScreen = false;
                 var isOccupy = false;
                 var selfEasyrtcid = "";
                 var callerId = "";
                 var self = this;
                 var acceptorHandler;
-                this.fullScreen = function () {
-                    document.documentElement.webkitRequestFullScreen();
-                }
 
-                this.init = function (peer) {
-                    document.addEventListener('webkitfullscreenchange', function () {
-                        self.isFullScreen = !self.isFullScreen;
-                        uku.refresh('appCtrl');
+                this.exit = function(){
+                    easyrtc.disconnect();
+                    easyrtc.setDisconnectListener(function(){
+                        easyrtc.closeLocalMediaStream();
                     });
-                    uku.refresh('appCtrl');
+                    this.fire('exitvideochat');
+                }
+                var timer;
+                this.init = function (peer) {
+                    uku.refresh();
                     easyrtc.setVideoDims(720, 720);
                     easyrtc.setRoomOccupantListener(roomOccupantHandler);
                     easyrtc.easyApp("easyrtc.audioVideoSimple", "selfVideo", ["callerVideo"], loginSuccess,
@@ -73,7 +73,7 @@
                         self.hasInvite = true;
                         self.callerName = easyrtc.idToName(easyrtcid);
                         acceptorHandler = acceptor;
-                        uku.refresh('appCtrl');
+                        uku.refresh();
                     });
                     easyrtc.setPeerClosedListener(function () {
                         console.log('PeerClosed');
@@ -81,8 +81,11 @@
                         self.inMeeting = false;
                         self.waitingJoin = true;
                         self.canInvite = true;
-                        uku.refresh('appCtrl');
+                        uku.refresh();
                     });
+                    timer = setTimeout(function(){
+                        self.exit();
+                    },30*1000);
                 };
 
                 this.accept = function () {
@@ -93,13 +96,14 @@
                     this.hasInvite = false;
                     this.waitingJoin = false;
                     this.inMeeting = true;
-                    //uku.refresh('appCtrl');
+                    //uku.refresh();
                 };
 
                 this.call = function () {
                     if (callerId) {
                         performCall(callerId);
                     }
+                    clearTimeout(timer);
                 }
 
                 this.hangUp = function () {
@@ -116,7 +120,7 @@
                     callerId = keys[0];
                     self.canInvite = true;
                     self.otherClientName = easyrtc.idToName(callerId);
-                    uku.refresh('appCtrl');
+                    uku.refresh();
                 }
 
                 function performCall(otherEasyrtcid) {
@@ -126,7 +130,7 @@
                         self.waitingJoin = false;
                         self.inMeeting = true;
                         self.canInvite = false;
-                        uku.refresh('appCtrl');
+                        uku.refresh();
                     };
                     var failureCB = function () {};
                     var wasAcceptedCB = function (wasAccepted, easyrtcid) {
@@ -134,7 +138,7 @@
                             console.log("call accepted by " + easyrtc.idToName(easyrtcid));                    
                             self.canInvite = false;
                             self.inMeeting = true;
-                            uku.refresh('appCtrl');
+                            uku.refresh();
                         } else {
                             console.log("call rejected" + easyrtc.idToName(easyrtcid));
                         }
@@ -146,7 +150,7 @@
                     console.log('login Success');
                     selfEasyrtcid = easyrtcid;
                     self.loadCamera = false;
-                    uku.refresh('appCtrl');
+                    uku.refresh();
                 }
 
                 function loginFailure(errorCode, message) {

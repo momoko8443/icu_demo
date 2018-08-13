@@ -5,16 +5,28 @@
                     <div id="bg"></div>
                     <h1>ICU视频探视系统</h1>
                     <h4>上海市第一人民医院松江分院</h4>
-                    <a class="center pure-button pure-button-primary button-xlarge" uku-onclick="cc.enter()">进入</a>
-                </div>
-                
+                    <button type="button" class="center pure-button pure-button-primary button-xlarge" uku-onclick="cc.enter()">进入</button>
+                    <button type="button" uku-render="!cc.isFullScreen" class="pure-button pure-button-primary fullScreen" uku-onclick="cc.fullScreen()">全屏</button>
+                    <button type="button"  class="pure-button pure-button-primary setting" uku-onclick="cc.setting()">设置</button>
+                </div>             
             </div>
         </template>
         <script>
             (function(){
                 return function(uku){
+                    this.isFullScreen = false;
+                    
+                    this.fullScreen = function () {
+                        document.documentElement.webkitRequestFullScreen();
+                        this.isFullScreen = true;
+                    };
+
+                    this.setting = function(){
+                        this.fire('entersettings');
+                    };
+
                     this.enter = function(){
-                        this.fire('enter_event');
+                        this.fire('enterevent');
                     };
                 };
             })();
@@ -42,6 +54,21 @@
                 transform: translate(-50%, -50%);
                 margin-bottom: 5px;
             }
+            .fullScreen{
+                left: 5%;
+                position: absolute;
+                transform: translate(-50%, -50%);
+                bottom: 40px;
+                background-color: forestgreen;
+            }
+            .setting{
+                left: 5%;
+                position: absolute;
+                transform: translate(-50%, -50%);
+                bottom: -10px;
+                background-color: forestgreen;
+            }
+
             .button-xlarge {
                 font-size: 125%;
             }

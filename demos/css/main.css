@@ -102,3 +102,9 @@ video{
     left: 50%;
     transform: translate(-50%, -50%);
 }
+
+#selfVideo{
+    transform: rotateY(180deg);
+    -webkit-transform: rotateY(180deg);
+    -moz-transform: rotateY(180deg);
+}

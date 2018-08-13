@@ -12,7 +12,11 @@ module.exports = function(webServer){
         socket.on('dial',function(data){
             var room = data.room;
             socket.to(room).emit('dial');
-        })
+        });
+        socket.on('peer_exit',function(data){
+            var room = data.room;
+            socket.to(room).emit('peer_exit');
+        });
     });
     return socketServer;
 }

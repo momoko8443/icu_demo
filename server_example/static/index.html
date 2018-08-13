@@ -15,28 +15,25 @@
     <script src="demos/js/jquery/jquery-3.3.1.min.js"></script>
     <script src="demos/js/jq.animate.plugin.js"></script>
     <script src="demos/js/axios/axios.min.js"></script>
+    <script src="/easyrtc/easyrtc.js"></script>
 </head>
 <body uku-application style="height: 100%;background-color: darkslategrey;">
-    <welcome id="welcome" uku-render="appCtrl.currentStage === 'welcome'"></welcome>
-    <!-- <setting-one></setting-one> -->
-    <login id="login" uku-render="appCtrl.currentStage === 'login'"></login>
-    <!-- <div id="viewContainer"></div> -->
-    <exit-channel id="exitChannel" uku-peer="appCtrl.peer" uku-render="appCtrl.currentStage === 'exitChannel'"></exit-channel>
-    <choose-channel id="chooseChannel" uku-render="appCtrl.currentStage === 'chooseChannel'"></choose-channel>
-    <video-chat id="videoChat" uku-render="appCtrl.currentStage === 'videoChat'"></video-chat>
+    <welcome id="welcome" uku-render="appCtrl.currentStage === 'welcome'" 
+        uku-onentersettings="appCtrl.enterSettingHandler()"
+        uku-onenterevent="appCtrl.enterEventHandler()"></welcome>
+    <login id="login" uku-render="appCtrl.currentStage === 'login'" 
+        uku-onloginsuccessevent="appCtrl.loginSuccessEventHandler()"
+        uku-oncancellogin="appCtrl.cancelLoginHandler()"></login>
+    <exit-channel id="exitChannel" uku-peer="appCtrl.peer" uku-render="appCtrl.currentStage === 'exitChannel'"
+        uku-onsettingsdeleted="appCtrl.settingsDeletedHandler()"
+        uku-oncancelexitchannel="appCtrl.cancelExitChannelHandler()"></exit-channel>
+    <choose-channel id="chooseChannel" uku-render="appCtrl.currentStage === 'chooseChannel'"
+        uku-onsettingssaved="appCtrl.settingsSavedHandler()"
+        uku-oncancelchoosechannel="appCtrl.cancelChooseChannelHandler()"></choose-channel>
+    <video-chat id="videoChat" uku-render="appCtrl.currentStage === 'videoChat'"
+        uku-onexitvideochat="appCtrl.exitVideoChatHandler()"></video-chat>
 </body>
 <script>
-    // var route = new RouteController("viewContainer");
-    // route.default("#home", "pages/home.html")
-    // .when("#guide", "pages/guide.html")
-    // .when("#example", "pages/example.html")
-    // .when("#performance", "pages/performance.html")
-    // .when("#api", "pages/api.html")
-    // .when("#showcase", "pages/showcase.html")
-    // .when("#about", "pages/about.html")
-    // .otherwise("pages/home.html")
-    // .addAnchor("repeat");
-
     var uku = new Ukulele();
     var appCtrl = new ApplicationController(uku);
     uku.registerComponent('welcome','demos/components/welcome.html');
@@ -56,63 +53,98 @@
         this.peer = {};
         var isRegister = false;
         var socket;
+        var welcomePage;
+        var loginPage;
+        var chooseChannelPage;
+        var exitChannelPage;
+        var videoChatPage;
         this.init = function(){
+            welcomePage = document.getElementById('welcome');
+            loginPage = document.getElementById('login');
+            chooseChannelPage = document.getElementById('chooseChannel');
+            exitChannelPage = document.getElementById('exitChannel');
+            videoChatPage = document.getElementById('videoChat');
             if(localStorage.getItem('peer')){
                 isRegister = true;
                 this.peer = JSON.parse(localStorage.getItem('peer'));
-
-                socket = io('https://localhost:8443');
+                socket = io('https://10.20.0.40:8443');
                 socket.on('client_connected', function (data) {
                     console.log(data);
                     socket.emit('join_room', { room: self.peer.channel.id });
                 });
                 socket.on('dial', function(data){
                     console.log('somebody dial me!!!');
+                    switchView(welcomePage,videoChatPage,function(){
+                        var videoChatInstance = uku.getComponentController('videoChat');
+                        videoChatInstance.init(self.peer);
+                    });
+                });
+                socket.on('peer_exit',function(data){
+                    var videoChatInstance = uku.getComponentController('videoChat');
+                    videoChatInstance.exit();
                 });
             }
 
-            var welcomePage = document.getElementById('welcome');
-            var loginPage = document.getElementById('login');
-            var chooseChannelPage = document.getElementById('chooseChannel');
-            var exitChannelPage = document.getElementById('exitChannel');
-            var videoChatPage = document.getElementById('videoChat');
-            welcomePage.addEventListener('enter_event',function(e){
+            this.enterSettingHandler = function(){
+                switchView(welcomePage,loginPage);
+            };
+            this.enterEventHandler = function(e){
                 if(isRegister){
                     if(socket){
                         socket.emit('dial',{ room: self.peer.channel.id });
-                        $(welcomePage).animateCss('fadeOut', function() {
-                            self.currentStage = "videoChat";
-                            uku.refresh();
-                            $(videoChatPage).animateCss('fadeIn');
-                        });
+                        switchView(e.currentTarget,videoChatPage,function(){
+                            var videoChatInstance = uku.getComponentController('videoChat');
+                            videoChatInstance.init(self.peer);
+                        })
                     }
                 }else{
-                    $(welcomePage).animateCss('fadeOut', function() {
-                        self.currentStage = "login";
-                        uku.refresh();
-                        $(loginPage).animateCss('fadeIn');
-                    });
+                    switchView(e.currentTarget, loginPage);
                 }
-            });
+            }
 
-            loginPage.addEventListener('login_success_event',function(e){
-                
-                $(loginPage).animateCss('fadeOut', function() {
-                    if(isRegister){
-                        self.currentStage = "exitChannel";
-                        uku.refresh();
-                        $(exitChannelPage).animateCss('fadeIn');
-
-                    }else{
+            this.loginSuccessEventHandler = function(e){
+                if(isRegister){
+                    switchView(e.currentTarget,exitChannelPage);
+                }else{
+                    switchView(e.currentTarget,chooseChannelPage,function(){
                         var chooseChannelInstance = uku.getComponentController('chooseChannel');
                         chooseChannelInstance.init();
-                        self.currentStage = "chooseChannel";
-                        uku.refresh();
-                        $(chooseChannelPage).animateCss('fadeIn');
-                    }
-                    
+                    });
+                }
+            };
+            this.cancelLoginHandler = function(e){
+                switchView(e.currentTarget,welcomePage);
+            };
+
+            this.settingsSavedHandler = function(){
+                location.reload();
+            };
+            this.settingsDeletedHandler = function(){
+                location.reload();
+            };
+
+            this.cancelChooseChannelHandler = function(e){
+                switchView(e.currentTarget,welcomePage);
+            };
+            this.cancelExitChannelHandler = function(e){
+                switchView(e.currentTarget,welcomePage);
+            };
+            this.exitVideoChatHandler = function(e){
+                switchView(e.currentTarget,welcomePage,function(){
+                    socket.emit('peer_exit',{ room: self.peer.channel.id });
                 });
-            })
+            };
+
+            function switchView(oldView,newView,callback){
+                $(oldView).animateCss('fadeOut', function(){
+                    self.currentStage = newView.id;
+                    uku.refresh();
+                    $(newView).animateCss('fadeIn');
+                    if(callback && typeof callback === 'function'){
+                        callback();
+                    }
+                })
+            }
         }
     }
 </script>

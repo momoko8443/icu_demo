@@ -15,7 +15,7 @@
                             </fieldset>
                             <fieldset>
                                 <button type="button" class="pure-button pure-button-primary" style="margin-right: 50px" uku-onclick="cc.exit()">退出频道</a>
-                                <button type="button" class="pure-button">取消</a>
+                                <button type="button" class="pure-button" uku-onclick="cc.cancel()">取消</a>
                             </fieldset>
                         </form>
                     </div>
@@ -26,6 +26,7 @@
             (function(ajax, jq){
                 return function(uku){
                     this.myPeer = {};
+                    var self = this;
                     Object.defineProperty(this, 'peer', {
                         set: function(value){
                             if(value){
@@ -38,10 +39,15 @@
                         ajax.delete('/api/channels/'+ this.myPeer.channel.id + '/peers/' + this.myPeer.id)
                         .then(function(res){
                             localStorage.removeItem('peer');
+                            self.fire('settingsdeleted');
                         })
                         .catch(function(err){
                             console.log(err);
                         });
+                    };
+
+                    this.cancel = function(){
+                        this.fire('cancelexitchannel');
                     };
                 };
             })(axios, $);
