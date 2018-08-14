@@ -12,21 +12,25 @@
                         <video autoplay="autoplay" playsinline="playsinline" style="height: 100%;width: 100%" id="selfVideo" muted="muted" volume="0"></video>
                     </div>
                     <div class="pure-u-1-2 pure-u-md-1 console">
-                        <div>
-                            <button type="button" class="pure-button pure-button-primary" uku-onclick="cc.exit()">退出</button>
+                        <div uku-render="cc.canInvite && !cc.hasInvite">
+                            <button type="button" class="pure-button pure-button-primary" uku-onclick="cc.call()">{{'呼叫 ' + cc.otherClientName}}</button>
                         </div>
-                        <div uku-render="cc.canInvite">
-                            <h2 class="post-title">{{cc.otherClientName}}</h2>
-                            <button type="button" class="pure-button pure-button-primary" uku-onclick="cc.call()">呼叫</button>
+                        <div uku-render="cc.isCalling">
+                            <h2 class="post-title">{{'正在呼叫 '+ cc.otherClientName}}</h2>
+                            <button type="button" class="pure-button" uku-onclicl="cc.cancelCall()">取消呼叫</button>
                         </div>
                         <div uku-render="cc.hasInvite">
                             <h2 class="post-title">{{'来自 ' + cc.callerName +' 的通话邀请'}}</h2>
                             <button type="button" class="pure-button pure-button-primary" uku-onclick="cc.accept()">接受</button>
+                            <button type="button" class="pure-button" uku-onclick="cc.reject()">拒接</button>
                         </div>
                         <div uku-render="cc.inMeeting">
                             <h2 class="post-title">通话时间</h2>
                             <h2 class="post-title">{{cc.time}}</h2>
                             <button type="button" class="pure-button pure-button-primary" uku-onclick="cc.hangUp()">挂断</button>
+                        </div>
+                        <div>
+                            <button type="button" class="pure-button" uku-onclick="cc.exit()">退出</button>
                         </div>
                     </div>
                 </div>
@@ -40,6 +44,7 @@
                 this.waitingJoin = true;
                 this.hasInvite = false;
                 this.inMeeting = false;
+                this.isCalling = false;
                 this.time = "00:00";
                 var isOccupy = false;
                 var selfEasyrtcid = "";
@@ -58,6 +63,7 @@
                 this.init = function (peer) {
                     uku.refresh();
                     easyrtc.setVideoDims(720, 720);
+                    easyrtc.setUsername(peer.alias);
                     easyrtc.setRoomOccupantListener(roomOccupantHandler);
                     easyrtc.easyApp("easyrtc.audioVideoSimple", "selfVideo", ["callerVideo"], loginSuccess,
                         loginFailure);
@@ -67,7 +73,6 @@
                     }, function failureCB(err) {
                         console.log('join room falied', err);
                     });
-                    easyrtc.setUsername(peer.name);
                     easyrtc.setAcceptChecker(function (easyrtcid, acceptor) {
                         console.log('acceptor ', easyrtcid);
                         self.hasInvite = true;
@@ -75,6 +80,9 @@
                         acceptorHandler = acceptor;
                         uku.refresh();
                     });
+                    // easyrtc.setCallCancelled(function(easyrtcid, explicitlyCancelled){
+                    //     console.log('cancel call by ',easyrtcid,explicitlyCancelled);
+                    // });
                     easyrtc.setPeerClosedListener(function () {
                         console.log('PeerClosed');
                         self.hasInvite = false;
@@ -83,33 +91,48 @@
                         self.canInvite = true;
                         uku.refresh();
                     });
-                    timer = setTimeout(function(){
-                        self.exit();
-                    },30*1000);
+                    // timer = setTimeout(function(){
+                    //     self.exit();
+                    // },300*1000);
                 };
 
                 this.accept = function () {
-                    // if(callerId){
-                    //     performCall(callerId);
-                    // }
                     acceptorHandler(true);
                     this.hasInvite = false;
                     this.waitingJoin = false;
                     this.inMeeting = true;
-                    //uku.refresh();
+                    this.canInvite = false;
+                    this.isCalling = false;
+                };
+                this.reject = function() {
+                    acceptorHandler(false);
+                    this.hasInvite = false;
+                    this.waitingJoin = true;
+                    this.inMeeting = false;
+                    this.canInvite = true;
+                    this.isCalling = false;
                 };
 
                 this.call = function () {
                     if (callerId) {
                         performCall(callerId);
                     }
+                    this.canInvite = false;
+                    this.isCalling = true;
                     clearTimeout(timer);
+                };
+
+                this.cancelCall = function(){
+                    this.canInvite = true;
+                    this.isCalling = false;
+                    easyrtc.hangupAll();
                 }
 
                 this.hangUp = function () {
                     easyrtc.hangupAll();
                     this.inMeeting = false;
-                    self.waitingJoin = true;
+                    this.waitingJoin = true;
+                    this.canInvite = true;
                 };
 
                 function roomOccupantHandler(roomName, data, isPrimary) {   
@@ -141,6 +164,9 @@
                             uku.refresh();
                         } else {
                             console.log("call rejected" + easyrtc.idToName(easyrtcid));
+                            self.isCalling = false;
+                            self.canInvite = true;
+                            uku.refresh();
                         }
                     };
                     easyrtc.call(otherEasyrtcid, successCB, failureCB, wasAcceptedCB);

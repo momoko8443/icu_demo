@@ -11,11 +11,11 @@ module.exports = function(webServer){
         });
         socket.on('dial',function(data){
             var room = data.room;
-            socket.to(room).emit('dial');
+            socketServer.to(room).emit('dial',data);
         });
         socket.on('peer_exit',function(data){
             var room = data.room;
-            socket.to(room).emit('peer_exit');
+            socketServer.to(room).emit('peer_exit',data);
         });
     });
     return socketServer;

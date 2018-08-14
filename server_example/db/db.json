@@ -5,8 +5,16 @@
       "name": "Channel 1",
       "peers": [
         {
-          "id": "0s0rK1SED",
-          "alias": "momoko"
+          "id": "TQSQBJgb0",
+          "alias": "momoko",
+          "channel": {
+            "id": "c1",
+            "name": "Channel 1"
+          }
+        },
+        {
+          "id": "AeFUNg-eN",
+          "alias": "sakura"
         }
       ]
     },
