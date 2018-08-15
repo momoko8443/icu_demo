@@ -32,6 +32,7 @@
         uku-oncancelchoosechannel="appCtrl.cancelChooseChannelHandler()"></choose-channel>
     <video-chat id="videoChat" uku-render="appCtrl.currentStage === 'videoChat'"
         uku-onexitvideochat="appCtrl.exitVideoChatHandler()"></video-chat>
+    <!-- <video-chat id="videoChat" uku-render="appCtrl.currentStage === 'videoChat'"></video-chat> -->
 </body>
 <script>
     var uku = new Ukulele();
@@ -64,10 +65,13 @@
             chooseChannelPage = document.getElementById('chooseChannel');
             exitChannelPage = document.getElementById('exitChannel');
             videoChatPage = document.getElementById('videoChat');
+            // videoChatPage.addEventListener('exitvideochat',function(e){
+            //     self.exitVideoChatHandler(e);
+            // })
             if(localStorage.getItem('peer')){
                 isRegister = true;
                 this.peer = JSON.parse(localStorage.getItem('peer'));
-                socket = io('https://192.168.1.102:8443');
+                socket = io('https://localhost:8443');
                 socket.on('client_connected', function (data) {
                     console.log(data);
                     socket.emit('join_room', { room: self.peer.channel.id });
@@ -83,6 +87,7 @@
                 });
                 socket.on('peer_exit',function(data){
                     if(data.self !== self.peer.id){
+                        console.log('peer_exit',data.self);
                         var videoChatInstance = uku.getComponentController('videoChat');
                         videoChatInstance.exit();
                     }  
@@ -135,7 +140,9 @@
             };
             this.exitVideoChatHandler = function(e){
                 switchView(e.currentTarget,welcomePage,function(){
-                    socket.emit('peer_exit',{ self:self.peer.id,room: self.peer.channel.id });
+                    if(e.originalEvent.data.isActive){ //isActive
+                        socket.emit('peer_exit',{ self:self.peer.id,room: self.peer.channel.id });
+                    }                   
                 });
             };
 

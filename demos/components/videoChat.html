@@ -30,7 +30,7 @@
                             <button type="button" class="pure-button pure-button-primary" uku-onclick="cc.hangUp()">挂断</button>
                         </div>
                         <div>
-                            <button type="button" class="pure-button" uku-onclick="cc.exit()">退出</button>
+                            <button type="button" class="pure-button" uku-onclick="cc.exit(true)">退出</button>
                         </div>
                     </div>
                 </div>
@@ -52,12 +52,13 @@
                 var self = this;
                 var acceptorHandler;
 
-                this.exit = function(){
+                this.exit = function(e,isActive){
                     easyrtc.disconnect();
                     easyrtc.setDisconnectListener(function(){
                         easyrtc.closeLocalMediaStream();
                     });
-                    this.fire('exitvideochat');
+                    this.fire('exitvideochat',{'isActive':isActive});
+                    
                 }
                 var timer;
                 this.init = function (peer) {
