@@ -4,10 +4,13 @@ div{
     box-sizing: border-box;
 }
 
-video{
+.videoFrame{
+    width: 100%;
+    height: 100%;
     border: 1px #9e9e9e solid;
     box-sizing: border-box;
 }
+
 .container{
     width: 100%;
     height: 100%;
@@ -107,4 +110,42 @@ video{
     transform: rotateY(180deg);
     -webkit-transform: rotateY(180deg);
     -moz-transform: rotateY(180deg);
+}
+
+.buttonBox{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+.exitBtn{
+    position: absolute;
+    top:5px;
+    right: 5px;
+}
+
+.button-success,
+.button-error,
+.button-warning,
+.button-secondary {
+    color: white;
+    border-radius: 4px;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+.button-success {
+    background: rgb(28, 184, 65); /* this is a green */
+}
+
+.button-error {
+    background: rgb(202, 60, 60); /* this is a maroon */
+}
+
+.button-warning {
+    background: rgb(223, 117, 20); /* this is an orange */
+}
+
+.button-secondary {
+    background: rgb(66, 184, 221); /* this is a light blue */
 }

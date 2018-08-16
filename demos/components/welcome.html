@@ -5,9 +5,13 @@
                     <div id="bg"></div>
                     <h1>ICU视频探视系统</h1>
                     <h4>上海市第一人民医院松江分院</h4>
-                    <button type="button" class="center pure-button pure-button-primary button-xlarge" uku-onclick="cc.enter()">进入</button>
-                    <button type="button" uku-render="!cc.isFullScreen" class="pure-button pure-button-primary fullScreen" uku-onclick="cc.fullScreen()">全屏</button>
-                    <button type="button"  class="pure-button pure-button-primary setting" uku-onclick="cc.setting()">设置</button>
+                    <button type="button" class="center pure-button pure-button-primary" uku-onclick="cc.enter()">
+                        <i class="fa fa-hand-o-right fa-lg">
+                            进入
+                        </i>
+                    </button>
+                    <i uku-render="!cc.isFullScreen" class="fa fa-window-maximize fa-lg fullScreen" uku-onclick="cc.fullScreen()"></i>
+                    <i class="fa fa-gear fa-lg setting" uku-onclick="cc.setting()"></i>
                 </div>             
             </div>
         </template>
@@ -55,18 +59,16 @@
                 margin-bottom: 5px;
             }
             .fullScreen{
-                left: 5%;
                 position: absolute;
-                transform: translate(-50%, -50%);
-                bottom: 40px;
-                background-color: forestgreen;
+                top: 10px;
+                right: 40px;
+                color: #795548;
             }
             .setting{
-                left: 5%;
+                right: 10px;
+                top: 10px;
                 position: absolute;
-                transform: translate(-50%, -50%);
-                bottom: -10px;
-                background-color: forestgreen;
+                color: #795548;
             }
 
             .button-xlarge {

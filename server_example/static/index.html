@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="demos/css/purecss/grids-responsive-min.css">
     <link rel="stylesheet" href="demos/css/animate/animate.css">
     <link rel="stylesheet" href="demos/css/main.css">
+    <link rel="stylesheet" href="demos/css/font-awesome/css/font-awesome.min.css">
     <script src="demos/js/socket.io/socket.io.min.js"></script>
     <script src="demos/js/uku-routejs/build/js/uku-route.js"></script>
     <script src="demos/js/ukulele/uku.js"></script>
@@ -86,8 +87,7 @@
                     }     
                 });
                 socket.on('peer_exit',function(data){
-                    if(data.self !== self.peer.id){
-                        console.log('peer_exit',data.self);
+                    if(data.self !== self.peer.id && self.currentStage === 'videoChat'){
                         var videoChatInstance = uku.getComponentController('videoChat');
                         videoChatInstance.exit();
                     }  
@@ -140,7 +140,7 @@
             };
             this.exitVideoChatHandler = function(e){
                 switchView(e.currentTarget,welcomePage,function(){
-                    if(e.originalEvent.data.isActive){ //isActive
+                    if(e.data.isActive){ //isActive
                         socket.emit('peer_exit',{ self:self.peer.id,room: self.peer.channel.id });
                     }                   
                 });
