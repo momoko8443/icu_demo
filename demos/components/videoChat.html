@@ -7,25 +7,25 @@
                     等待对方加入...
                 </h1>
                 <div class="videoFrame">
-                        <video autoplay="autoplay" playsinline="playsinline" style="height: 100%;width: 100%" id="callerVideo"></video>
-                </div>        
+                    <video autoplay="autoplay" playsinline="playsinline" style="height: 100%;width: 100%" id="callerVideo"></video>
+                </div>
             </div>
             <div class="pure-u-1 pure-u-md-1-4 sub">
                 <div class="pure-g height100">
                     <div class="pure-u-1-2 pure-u-md-1 self">
-                        <h1 class="waiting content-subhead" uku-render="cc.loadCamera">                     
+                        <h1 class="waiting content-subhead" uku-render="cc.loadCamera">
                             <i class="fa fa-circle-o-notch fa-spin"></i>
                             正在开启摄像头...
                         </h1>
                         <div class="videoFrame">
                             <video autoplay="autoplay" playsinline="playsinline" style="height: 100%;width: 100%" id="selfVideo" muted="muted" volume="0"></video>
-                        </div>               
+                        </div>
                     </div>
                     <div class="pure-u-1-2 pure-u-md-1 console">
                         <div class="buttonBox">
                             <div uku-render="cc.currentState ==='standby'">
                                 <button type="button" class="pure-button button-success" uku-onclick="cc.call()">
-                                    <i class="fa fa-phone fa-lg">{{'  呼叫 ' + cc.otherClientName}}</i>   
+                                    <i class="fa fa-phone fa-lg">{{' 呼叫 ' + cc.otherClientName}}</i>
                                 </button>
                             </div>
                             <div uku-render="cc.currentState ==='calling'">
@@ -38,7 +38,7 @@
                                 <button type="button" class="pure-button button-error" uku-onclick="cc.cancelCall()">
                                     <i class="fa fa-ban fa-lg">
                                         取消呼叫
-                                    </i>                   
+                                    </i>
                                 </button>
                             </div>
                             <div uku-render="cc.currentState==='called'">
@@ -46,9 +46,9 @@
                                     <i class="fa fa-spinner fa-pulse"></i>
                                     <span>
                                         {{'来自 ' + cc.callerName +' 视频电话'}}
-                                    </span> 
+                                    </span>
                                 </h3>
-                                <button type="button" class="pure-button button-success" uku-onclick="cc.accept()">           
+                                <button type="button" class="pure-button button-success" uku-onclick="cc.accept()">
                                     <i class="fa fa-phone fa-lg">
                                         接听
                                     </i>
@@ -82,7 +82,7 @@
         (function () {
             return function (uku) {
                 this.loadCamera = true;
-                this.currentState = '';    
+                this.currentState = '';
                 this.time = 10 * 60 * 1000;
                 this.timeDisplay = "";
                 this.peer = null;
@@ -91,20 +91,24 @@
                 var self = this;
                 var acceptorHandler;
 
-                this.timeDisplayFunc = function(){
+                this.timeDisplayFunc = function () {
                     var tmp = new Date(this.time);
                     this.timeDisplay = tmp.getMinutes() + ':' + tmp.getSeconds();
                     uku.refresh();
                 }
 
-                this.exit = function(e,isActive){
+                this.exit = function (e, isActive) {
                     var room = this.peer.channel.id;
                     easyrtc.leaveRoom(room);
                     easyrtc.disconnect();
-                    easyrtc.setDisconnectListener(function(){
+                    this.currentState = "exit";
+                    easyrtc.setDisconnectListener(function () {
                         easyrtc.closeLocalMediaStream();
+                        self.fire('exitvideochat', {
+                            'isActive': isActive
+                        });
                     });
-                    this.fire('exitvideochat',{'isActive':isActive});    
+
                 }
                 var timerAutoExit;
                 var timerCountdown;
@@ -115,26 +119,34 @@
                     easyrtc.setVideoDims(1280, 720);
                     easyrtc.setUsername(peer.alias);
                     easyrtc.setRoomOccupantListener(roomOccupantHandler);
-                    easyrtc.easyApp("easyrtc.audioVideoSimple", "selfVideo", ["callerVideo"], loginSuccess,
-                        loginFailure);
+                    easyrtc.easyApp("easyrtc.audioVideoSimple", "selfVideo", ["callerVideo"], 
+                        function loginSuccess(easyrtcid) {
+                            console.log('login easyrtc Success');
+                            selfEasyrtcid = easyrtcid;
+                            self.loadCamera = false;
+                            easyrtc.joinRoom(room, null, function successCB() {
+                                console.log('join room success');
+                            }, function failureCB(err) {
+                                console.log('join room falied', err);
+                            });
+                            uku.refresh();
+                        },
+                        function loginFailure(errorCode, message) {
+                            console.log('login easyrtc failed');
+                            easyrtc.showError(errorCode, message);
+                        });
                     var room = peer.channel.id;
-                    easyrtc.joinRoom(room, null, function successCB() {
-                        console.log('join room success');
-                    }, function failureCB(err) {
-                        console.log('join room falied', err);
-                    });
+
                     easyrtc.setAcceptChecker(function (easyrtcid, acceptor) {
                         console.log('acceptor ', easyrtcid);
                         self.callerName = easyrtc.idToName(easyrtcid);
                         acceptorHandler = acceptor;
                         self.currentState = 'called';
-                        document.getElementById('ring').play();
                         uku.refresh();
                     });
-                    easyrtc.setCallCancelled(function(easyrtcid, explicitlyCancelled){
-                        if(explicitlyCancelled){
+                    easyrtc.setCallCancelled(function (easyrtcid, explicitlyCancelled) {
+                        if (explicitlyCancelled) {
                             self.currentState = 'standby';
-                            document.getElementById('ring').pause();
                             uku.refresh();
                         }
                     });
@@ -143,47 +155,32 @@
                         self.currentState = 'standby';
                         uku.refresh();
                     });
-
-                    // timerAutoExit = setTimeout(function(){
-                    //     self.exit();
-                    // },30*1000);
                 };
-
-                //states
-                //0. no_standy
-                //1. standby
-                //2. calling  & being_called
-                //3. in_meeting
 
                 this.accept = function () {
-                    document.getElementById('ring').pause();
                     this.currentState = 'inMeeting';
                     acceptorHandler(true);
-                    timerCountdown = setInterval(function(){
+                    timerCountdown = setInterval(function () {
                         self.time -= 1000;
                         self.timeDisplayFunc();
-                    },1000);
+                    }, 1000);
                 };
-                this.reject = function() {
+                this.reject = function () {
                     acceptorHandler(false);
                     this.currentState = 'standby';
-                    document.getElementById('ring').pause();
                 };
 
                 this.call = function () {
                     if (callerId) {
                         performCall(callerId);
                     }
-                    
+
                     this.currentState = 'calling';
-                    document.getElementById('ring').play();
-                    //clearTimeout(timer);
                 };
 
-                this.cancelCall = function(){
+                this.cancelCall = function () {
                     easyrtc.hangupAll();
                     this.currentState = 'standby';
-                    document.getElementById('ring').pause();
                 }
 
                 this.hangUp = function () {
@@ -191,7 +188,32 @@
                     this.currentState = 'standby';
                 };
 
-                function roomOccupantHandler(roomName, data, isPrimary) {   
+                var _currentState;
+                Object.defineProperty(this, 'currentState', {
+                    set(value) {
+                        _currentState = value;
+                        if (_currentState === 'calling' || _currentState === 'called') {
+                            document.getElementById('ring').play();
+                        } else {
+                            document.getElementById('ring').pause();
+                        }
+                        if (_currentState === 'init' || _currentState === 'standby') {
+                            timerAutoExit = setTimeout(function () {
+                                self.exit();
+                            }, 30 * 1000);
+                        } else {
+                            if (timerAutoExit) {
+                                clearTimeout(timerAutoExit);
+                            }
+                        }
+                    },
+                    get() {
+                        return _currentState;
+                    }
+
+                });
+
+                function roomOccupantHandler(roomName, data, isPrimary) {
                     var keys = Object.keys(data);
                     if (keys.length === 0) {
                         return;
@@ -212,42 +234,36 @@
                     var failureCB = function () {};
                     var wasAcceptedCB = function (wasAccepted, easyrtcid) {
                         if (wasAccepted) {
-                            console.log("call accepted by " + easyrtc.idToName(easyrtcid));                    
+                            console.log("call accepted by " + easyrtc.idToName(easyrtcid));
                             self.currentState = 'inMeeting';
                             uku.refresh();
-                            timerCountdown = setInterval(function(){
+                            timerCountdown = setInterval(function () {
                                 self.time -= 1000;
                                 self.timeDisplayFunc();
-                            },1000);
+                            }, 1000);
                         } else {
                             console.log("call rejected" + easyrtc.idToName(easyrtcid));
                             self.currentState = 'standby';
                             uku.refresh();
                         }
-                        document.getElementById('ring').pause();
                     };
                     easyrtc.call(otherEasyrtcid, successCB, failureCB, wasAcceptedCB);
                 }
 
-                function loginSuccess(easyrtcid) {
-                    console.log('login Success');
-                    selfEasyrtcid = easyrtcid;
-                    self.loadCamera = false;
-                    uku.refresh();
-                }
-
-                function loginFailure(errorCode, message) {
-                    easyrtc.showError(errorCode, message);
-                }
-
-                function resetFlags(){
+                function resetFlags() {
                     self.loadCamera = true;
-                    self.currentState = '';
+                    self.currentState = 'init';
                     self.time = 10 * 60 * 1000;
                     self.timeDisplay = "";
                     self.peer = null;
                     selfEasyrtcid = "";
                     callerId = "";
+                    if(timerAutoExit){
+                        clearTimeout(timerAutoExit);
+                    }
+                    if(timerCountdown){
+                        clearInterval(timerCountdown);
+                    }
                 }
             }
         })()
