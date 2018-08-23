@@ -198,12 +198,18 @@
                             document.getElementById('ring').pause();
                         }
                         if (_currentState === 'init' || _currentState === 'standby') {
+                            console.log('start timer', timerAutoExit  , _currentState);
+                            if(timerAutoExit){
+                                clearTimeout(timerAutoExit);
+                            }
                             timerAutoExit = setTimeout(function () {
                                 self.exit();
                             }, 30 * 1000);
+                                        
                         } else {
                             if (timerAutoExit) {
                                 clearTimeout(timerAutoExit);
+                                console.log('clear timer', timerAutoExit , _currentState);
                             }
                         }
                     },

@@ -21,7 +21,20 @@
     {
       "id": "c2",
       "name": "Channel 2",
-      "peers": []
+      "peers": [
+        {
+          "id": "sPqBLXsue",
+          "alias": "坚果pro2",
+          "channel": {
+            "id": "c2",
+            "name": "Channel 2"
+          }
+        },
+        {
+          "id": "IB3uUh428",
+          "alias": "huawei"
+        }
+      ]
     },
     {
       "id": "c3",

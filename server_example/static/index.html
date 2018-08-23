@@ -72,7 +72,7 @@
             if(localStorage.getItem('peer')){
                 isRegister = true;
                 this.peer = JSON.parse(localStorage.getItem('peer'));
-                socket = io('https://localhost:8443');
+                socket = io(location.href);
                 socket.on('client_connected', function (data) {
                     console.log(data);
                     socket.emit('join_room', { room: self.peer.channel.id });
