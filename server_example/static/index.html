@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>ICU RTC</title>
+    <link rel="shortcut icon" href="demos/favicon/favicon.ico" >
+    <link rel="icon" type="image/gif" href="demos/favicon/animated_favicon1.gif" >
     <link rel="stylesheet" href="demos/css/purecss/pure-min.css">
     <link rel="stylesheet" href="demos/css/purecss/grids-responsive-min.css">
     <link rel="stylesheet" href="demos/css/animate/animate.css">
@@ -71,7 +73,17 @@
             // })
             if(localStorage.getItem('peer')){
                 isRegister = true;
-                this.peer = JSON.parse(localStorage.getItem('peer'));
+                try{
+                    this.peer = JSON.parse(localStorage.getItem('peer'));
+                    if(!this.peer){
+                        alert('未能读取节点配置信息');
+                        return;
+                    }
+                }catch(e){
+                    alert(JSON.stringify(e));
+                    return;
+                }
+                
                 socket = io(location.href);
                 socket.on('client_connected', function (data) {
                     console.log(data);

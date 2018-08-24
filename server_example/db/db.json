@@ -39,7 +39,16 @@
     {
       "id": "c3",
       "name": "Channel 3",
-      "peers": []
+      "peers": [
+        {
+          "id": "PZFLPEFbg",
+          "alias": "huawei m5"
+        },
+        {
+          "id": "juxISJNTa",
+          "alias": "macbook pro"
+        }
+      ]
     },
     {
       "id": "c4",

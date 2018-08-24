@@ -30,6 +30,9 @@
                     };
 
                     this.enter = function(){
+                        if(!this.isFullScreen){
+                            //this.fullScreen();
+                        }
                         this.fire('enterevent');
                     };
                 };

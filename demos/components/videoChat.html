@@ -2,9 +2,8 @@
     <template>
         <div class="pure-g container">
             <div class="pure-u-1 pure-u-md-3-4 main">
-                <h1 class="waiting content-subhead" uku-render="cc.waitingJoin">
-                    <!-- <i class="fa fa-circle-o-notch fa-spin"></i> -->
-                    等待对方加入...
+                <h1 class="waiting content-subhead" uku-render="cc.currentState !== 'inMeeting'">
+                    {{cc.message}}
                 </h1>
                 <div class="videoFrame">
                     <video autoplay="autoplay" playsinline="playsinline" style="height: 100%;width: 100%" id="callerVideo"></video>
@@ -48,20 +47,20 @@
                                         {{'来自 ' + cc.callerName +' 视频电话'}}
                                     </span>
                                 </h3>
-                                <button type="button" class="pure-button button-success" uku-onclick="cc.accept()">
+                                <button type="button" class="pure-button button-success" style="margin-top:10px" uku-onclick="cc.accept()">
                                     <i class="fa fa-phone fa-lg">
                                         接听
                                     </i>
                                 </button>
-                                <button type="button" class="pure-button button-error" uku-onclick="cc.reject()">
+                                <button type="button" class="pure-button button-error" style="margin-top:10px" uku-onclick="cc.reject()">
                                     <i class="fa fa-ban fa-lg">
                                         拒绝
                                     </i>
                                 </button>
                             </div>
                             <div uku-render="cc.currentState==='inMeeting'">
-                                <h2 class="post-title">通话时间</h2>
-                                <h2 class="post-title">{{cc.timeDisplay}}</h2>
+                                <h2 class="post-title">剩余通话时间</h2>
+                                <h2 id="timeleft" class="post-title">{{cc.timeDisplay}}</h2>
                                 <button type="button" class="pure-button button-error" uku-onclick="cc.hangUp()">
                                     <i class="fa fa-ban fa-lg">
                                         结束通话
@@ -79,11 +78,13 @@
         </div>
     </template>
     <script>
-        (function () {
+        (function (jq) {
             return function (uku) {
+                this.message = '等待对方加入...';
                 this.loadCamera = true;
                 this.currentState = '';
-                this.time = 10 * 60 * 1000;
+                this.time = 2 * 60 * 1000;
+                var autoExitTimeLeft = 15;
                 this.timeDisplay = "";
                 this.peer = null;
                 var selfEasyrtcid = "";
@@ -93,12 +94,21 @@
 
                 this.timeDisplayFunc = function () {
                     var tmp = new Date(this.time);
-                    this.timeDisplay = tmp.getMinutes() + ':' + tmp.getSeconds();
+                    var min = tmp.getMinutes();
+                    if (min < 10) {
+                        min = '0' + min;
+                    }
+                    var sec = tmp.getSeconds();
+                    if (sec < 10) {
+                        sec = '0' + sec;
+                    }
+                    this.timeDisplay = min + ':' + sec;
                     uku.refresh();
                 }
 
                 this.exit = function (e, isActive) {
-                    var room = this.peer.channel.id;
+                    resetFlags();
+                    var room = self.peer.channel.id;
                     easyrtc.leaveRoom(room);
                     easyrtc.disconnect();
                     this.currentState = "exit";
@@ -119,7 +129,7 @@
                     easyrtc.setVideoDims(1280, 720);
                     easyrtc.setUsername(peer.alias);
                     easyrtc.setRoomOccupantListener(roomOccupantHandler);
-                    easyrtc.easyApp("easyrtc.audioVideoSimple", "selfVideo", ["callerVideo"], 
+                    easyrtc.easyApp("easyrtc.audioVideoSimple", "selfVideo", ["callerVideo"],
                         function loginSuccess(easyrtcid) {
                             console.log('login easyrtc Success');
                             selfEasyrtcid = easyrtcid;
@@ -160,10 +170,7 @@
                 this.accept = function () {
                     this.currentState = 'inMeeting';
                     acceptorHandler(true);
-                    timerCountdown = setInterval(function () {
-                        self.time -= 1000;
-                        self.timeDisplayFunc();
-                    }, 1000);
+                    timerCountdown = setInterval(countdown, 1000);
                 };
                 this.reject = function () {
                     acceptorHandler(false);
@@ -174,7 +181,6 @@
                     if (callerId) {
                         performCall(callerId);
                     }
-
                     this.currentState = 'calling';
                 };
 
@@ -186,6 +192,7 @@
                 this.hangUp = function () {
                     easyrtc.hangupAll();
                     this.currentState = 'standby';
+                    this.exit();
                 };
 
                 var _currentState;
@@ -198,20 +205,28 @@
                             document.getElementById('ring').pause();
                         }
                         if (_currentState === 'init' || _currentState === 'standby') {
-                            console.log('start timer', timerAutoExit  , _currentState);
-                            if(timerAutoExit){
-                                clearTimeout(timerAutoExit);
+                            
+                            console.log('start timer', timerAutoExit, _currentState);
+                            if (timerAutoExit) {
+                                clearInterval(timerAutoExit);
                             }
-                            timerAutoExit = setTimeout(function () {
-                                self.exit();
-                            }, 30 * 1000);
-                                        
+                            autoExitTimeLeft = 15;
+                            timerAutoExit = setInterval(function () {      
+                                self.message = '对方已就绪, 若'+ autoExitTimeLeft +'秒内不发起通话则自动退出';
+                                autoExitTimeLeft--;
+                                uku.refresh();
+                                if(autoExitTimeLeft < 0){
+                                    self.exit();
+                                }         
+                            }, 1000);
+
                         } else {
                             if (timerAutoExit) {
-                                clearTimeout(timerAutoExit);
-                                console.log('clear timer', timerAutoExit , _currentState);
+                                clearInterval(timerAutoExit);
+                                console.log('clear timer', timerAutoExit, _currentState);
                             }
                         }
+                        updateMessage(_currentState);
                     },
                     get() {
                         return _currentState;
@@ -243,10 +258,7 @@
                             console.log("call accepted by " + easyrtc.idToName(easyrtcid));
                             self.currentState = 'inMeeting';
                             uku.refresh();
-                            timerCountdown = setInterval(function () {
-                                self.time -= 1000;
-                                self.timeDisplayFunc();
-                            }, 1000);
+                            timerCountdown = setInterval(countdown, 1000);
                         } else {
                             console.log("call rejected" + easyrtc.idToName(easyrtcid));
                             self.currentState = 'standby';
@@ -257,21 +269,49 @@
                 }
 
                 function resetFlags() {
+                    autoExitTimeLeft = 15;
+                    self.message = '等待对方加入...';
                     self.loadCamera = true;
                     self.currentState = 'init';
-                    self.time = 10 * 60 * 1000;
+                    self.time = 2 * 60 * 1000;
                     self.timeDisplay = "";
-                    self.peer = null;
                     selfEasyrtcid = "";
                     callerId = "";
-                    if(timerAutoExit){
+                    jq('#timeleft').removeClass('six_zero_sec_left');
+                    if (timerAutoExit) {
                         clearTimeout(timerAutoExit);
                     }
-                    if(timerCountdown){
+                    if (timerCountdown) {
                         clearInterval(timerCountdown);
                     }
                 }
+
+                function countdown() {
+                    self.time -= 1000;
+                    self.timeDisplayFunc();
+                    if (self.time === 60 * 1000) {
+                        jq('#timeleft').addClass('six_zero_sec_left');
+                    }
+                    if (self.time === 0) {
+                        clearInterval(timerCountdown);
+                        self.exit();
+                    }
+                }
+                function updateMessage(state){
+                    
+                    switch(state){
+                        case 'init':
+                            self.message = '等待对方加入...';
+                            break;
+                        case 'standby':
+                            self.message = '对方已就绪, 若15秒内不发起通话则自动退出';
+                            break;
+                        default:
+                            self.message = '等待对方加入...';
+                    }
+                    uku.refresh();
+                }
             }
-        })()
+        })($)
     </script>
 </uku-component>
