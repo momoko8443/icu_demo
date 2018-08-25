@@ -17,6 +17,10 @@ module.exports = function(webServer){
             var room = data.room;
             socketServer.to(room).emit('peer_exit',data);
         });
+        socket.on('cancel_calling',function(data){
+            var room = data.room;
+            socketServer.to(room).emit('cancel_calling',data);
+        })
     });
     return socketServer;
 }

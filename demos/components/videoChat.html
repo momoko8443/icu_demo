@@ -2,9 +2,15 @@
     <template>
         <div class="pure-g container">
             <div class="pure-u-1 pure-u-md-3-4 main">
-                <h1 class="waiting content-subhead" uku-render="cc.currentState !== 'inMeeting'">
-                    {{cc.message}}
-                </h1>
+                <div class="waiting" uku-render="cc.currentState !== 'inMeeting'">
+                    <h1 class="content-subhead">
+                        {{cc.message}}
+                    </h1>
+                    <h1 class="content-subhead">
+                        {{cc.message2}}
+                    </h1>
+                </div>
+                
                 <div class="videoFrame">
                     <video autoplay="autoplay" playsinline="playsinline" style="height: 100%;width: 100%" id="callerVideo"></video>
                 </div>
@@ -44,7 +50,7 @@
                                 <h3 class="post-title">
                                     <i class="fa fa-spinner fa-pulse"></i>
                                     <span>
-                                        {{'来自 ' + cc.callerName +' 视频电话'}}
+                                        {{'来自 ' + cc.callerName + '呼叫'}}
                                     </span>
                                 </h3>
                                 <button type="button" class="pure-button button-success" style="margin-top:10px" uku-onclick="cc.accept()">
@@ -81,10 +87,11 @@
         (function (jq) {
             return function (uku) {
                 this.message = '等待对方加入...';
+                this.message2 = '';
                 this.loadCamera = true;
                 this.currentState = '';
                 this.time = 2 * 60 * 1000;
-                var autoExitTimeLeft = 15;
+                var autoExitTimeLeft = 30;
                 this.timeDisplay = "";
                 this.peer = null;
                 var selfEasyrtcid = "";
@@ -122,6 +129,7 @@
                 }
                 var timerAutoExit;
                 var timerCountdown;
+                var timerRing;
                 this.init = function (peer) {
                     resetFlags();
                     this.peer = peer;
@@ -183,10 +191,12 @@
                     }
                     this.currentState = 'calling';
                 };
-
+                var initiativelyCancelFlag = false;
                 this.cancelCall = function () {
-                    easyrtc.hangupAll();
+                    //easyrtc.hangupAll();
+                    this.fire('cancelcalling');
                     this.currentState = 'standby';
+                    initiativelyCancelFlag = true;
                 }
 
                 this.hangUp = function () {
@@ -199,18 +209,30 @@
                 Object.defineProperty(this, 'currentState', {
                     set(value) {
                         _currentState = value;
+                        if(_currentState === 'called'){
+                            if(timerRing){
+                                clearTimeout(timerRing);
+                            }
+                            timerRing = setTimeout(function(){
+                                self.reject();
+                                clearTimeout(timerRing);
+                            }, 50 * 1000);
+                        }else{
+                            if(timerRing){
+                                clearTimeout(timerRing);
+                            }
+                        }
                         if (_currentState === 'calling' || _currentState === 'called') {
                             document.getElementById('ring').play();
                         } else {
                             document.getElementById('ring').pause();
                         }
                         if (_currentState === 'init' || _currentState === 'standby') {
-                            
-                            console.log('start timer', timerAutoExit, _currentState);
+                            //console.log('start timer', timerAutoExit, _currentState);
                             if (timerAutoExit) {
                                 clearInterval(timerAutoExit);
                             }
-                            autoExitTimeLeft = 15;
+                            autoExitTimeLeft = 30;
                             timerAutoExit = setInterval(function () {      
                                 self.message = '对方已就绪, 若'+ autoExitTimeLeft +'秒内不发起通话则自动退出';
                                 autoExitTimeLeft--;
@@ -223,7 +245,7 @@
                         } else {
                             if (timerAutoExit) {
                                 clearInterval(timerAutoExit);
-                                console.log('clear timer', timerAutoExit, _currentState);
+                                //console.log('clear timer', timerAutoExit, _currentState);
                             }
                         }
                         updateMessage(_currentState);
@@ -252,7 +274,10 @@
                         self.currentState = 'inMeeting';
                         uku.refresh();
                     };
-                    var failureCB = function () {};
+                    var failureCB = function (errorCode, errMessage) {
+                        console.log('performCall Failed');
+                        console.error(errorCode,errMessage);
+                    };
                     var wasAcceptedCB = function (wasAccepted, easyrtcid) {
                         if (wasAccepted) {
                             console.log("call accepted by " + easyrtc.idToName(easyrtcid));
@@ -260,17 +285,31 @@
                             uku.refresh();
                             timerCountdown = setInterval(countdown, 1000);
                         } else {
-                            console.log("call rejected" + easyrtc.idToName(easyrtcid));
+                            console.log("call rejected" + easyrtc.idToName(easyrtcid));               
                             self.currentState = 'standby';
+                            if(initiativelyCancelFlag){
+                                self.message2 = '主动取消呼叫';
+                            }else{
+                                self.message2 = '对方拒接或长时间呼叫无人应答, 请稍后再拨';
+                            }    
                             uku.refresh();
+                            setTimeout(function(){
+                                self.message2 = '';
+                                initiativelyCancelFlag = false;
+                                uku.refresh();
+                            },5000);
                         }
                     };
-                    easyrtc.call(otherEasyrtcid, successCB, failureCB, wasAcceptedCB);
+                    setTimeout(function(){
+                        easyrtc.call(otherEasyrtcid, successCB, failureCB, wasAcceptedCB);
+                    }, 2000);
+                    
                 }
 
                 function resetFlags() {
-                    autoExitTimeLeft = 15;
+                    autoExitTimeLeft = 30;
                     self.message = '等待对方加入...';
+                    self.message2 = '';
                     self.loadCamera = true;
                     self.currentState = 'init';
                     self.time = 2 * 60 * 1000;
@@ -304,7 +343,19 @@
                             self.message = '等待对方加入...';
                             break;
                         case 'standby':
-                            self.message = '对方已就绪, 若15秒内不发起通话则自动退出';
+                            self.message = '对方已就绪, 若' + autoExitTimeLeft + '秒内不发起通话则自动退出';
+                            break;
+                        case 'calling':
+                            self.message = '呼叫中...';
+                            break;
+                        case 'called':
+                            self.message = '被呼叫中..., 请接听或拒绝';
+                            break;
+                        case 'inMeeting':
+                            self.message = '通话中...';
+                            break;
+                        case 'exit': 
+                            self.message = '正在退出...';
                             break;
                         default:
                             self.message = '等待对方加入...';

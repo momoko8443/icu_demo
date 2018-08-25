@@ -34,6 +34,7 @@
         uku-onsettingssaved="appCtrl.settingsSavedHandler()"
         uku-oncancelchoosechannel="appCtrl.cancelChooseChannelHandler()"></choose-channel>
     <video-chat id="videoChat" uku-render="appCtrl.currentStage === 'videoChat'"
+        uku-oncancelcalling="appCtrl.cancelcallingHandler()"
         uku-onexitvideochat="appCtrl.exitVideoChatHandler()"></video-chat>
     <!-- <video-chat id="videoChat" uku-render="appCtrl.currentStage === 'videoChat'"></video-chat> -->
 </body>
@@ -104,6 +105,12 @@
                         videoChatInstance.exit();
                     }  
                 });
+                socket.on('cancel_calling',function(data){
+                    if(data.self !== self.peer.id && self.currentStage === 'videoChat'){
+                        var videoChatInstance = uku.getComponentController('videoChat');
+                        videoChatInstance.reject();
+                    }
+                })
             }
 
             this.enterSettingHandler = function(){
@@ -157,6 +164,9 @@
                     }                   
                 });
             };
+            this.cancelcallingHandler = function(e){
+                socket.emit('cancel_calling',{ self:self.peer.id,room: self.peer.channel.id });
+            }
 
             function switchView(oldView,newView,callback){
                 $(oldView).animateCss('fadeOut', function(){
