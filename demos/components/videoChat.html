@@ -86,18 +86,23 @@
     <script>
         (function (jq) {
             return function (uku) {
-                this.message = '等待对方加入...';
+                this.message = '';
                 this.message2 = '';
                 this.loadCamera = true;
                 this.currentState = '';
-                this.time = 2 * 60 * 1000;
-                var autoExitTimeLeft = 30;
+                this.time = 0;
                 this.timeDisplay = "";
                 this.peer = null;
+
+                var autoExitTimeLeft;
                 var selfEasyrtcid = "";
                 var callerId = "";
                 var self = this;
                 var acceptorHandler;
+                var config;
+                var timerAutoExit;
+                var timerCountdown;
+                var timerRing;
 
                 this.timeDisplayFunc = function () {
                     var tmp = new Date(this.time);
@@ -114,7 +119,7 @@
                 }
 
                 this.exit = function (e, isActive) {
-                    resetFlags();
+                    resetFlags(config);
                     var room = self.peer.channel.id;
                     easyrtc.leaveRoom(room);
                     easyrtc.disconnect();
@@ -127,11 +132,10 @@
                     });
 
                 }
-                var timerAutoExit;
-                var timerCountdown;
-                var timerRing;
-                this.init = function (peer) {
-                    resetFlags();
+                
+                this.init = function (peer, cfg) {
+                    config = cfg;
+                    resetFlags(cfg);
                     this.peer = peer;
                     uku.refresh();
                     easyrtc.setVideoDims(1280, 720);
@@ -186,17 +190,22 @@
                 };
 
                 this.call = function () {
+                    enableCancel = false;
                     if (callerId) {
                         performCall(callerId);
                     }
                     this.currentState = 'calling';
                 };
+
                 var initiativelyCancelFlag = false;
+                var enableCancel = false;
+
                 this.cancelCall = function () {
-                    //easyrtc.hangupAll();
-                    this.fire('cancelcalling');
-                    this.currentState = 'standby';
-                    initiativelyCancelFlag = true;
+                    if(enableCancel){
+                        this.fire('cancelcalling');
+                        this.currentState = 'standby';
+                        initiativelyCancelFlag = true;
+                    }      
                 }
 
                 this.hangUp = function () {
@@ -302,17 +311,17 @@
                     };
                     setTimeout(function(){
                         easyrtc.call(otherEasyrtcid, successCB, failureCB, wasAcceptedCB);
+                        enableCancel = true;
                     }, 2000);
-                    
                 }
 
-                function resetFlags() {
-                    autoExitTimeLeft = 30;
+                function resetFlags(cfg) {
+                    autoExitTimeLeft = cfg.autoExitSecond;
                     self.message = '等待对方加入...';
                     self.message2 = '';
                     self.loadCamera = true;
                     self.currentState = 'init';
-                    self.time = 2 * 60 * 1000;
+                    self.time = cfg.callLimitSecond * 1000;
                     self.timeDisplay = "";
                     selfEasyrtcid = "";
                     callerId = "";

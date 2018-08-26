@@ -53,7 +53,20 @@
     {
       "id": "c4",
       "name": "Channel 4",
-      "peers": []
+      "peers": [
+        {
+          "id": "LqqHS9CO8",
+          "alias": "MBP",
+          "channel": {
+            "id": "c4",
+            "name": "Channel 4"
+          }
+        },
+        {
+          "id": "t_1yVxKlL",
+          "alias": "huawei m5"
+        }
+      ]
     },
     {
       "id": "c5",

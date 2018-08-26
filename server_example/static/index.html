@@ -69,9 +69,7 @@
             chooseChannelPage = document.getElementById('chooseChannel');
             exitChannelPage = document.getElementById('exitChannel');
             videoChatPage = document.getElementById('videoChat');
-            // videoChatPage.addEventListener('exitvideochat',function(e){
-            //     self.exitVideoChatHandler(e);
-            // })
+
             if(localStorage.getItem('peer')){
                 isRegister = true;
                 try{
@@ -95,7 +93,7 @@
                         console.log('somebody dial me!!!');
                         switchView(welcomePage,videoChatPage,function(){
                             var videoChatInstance = uku.getComponentController('videoChat');
-                            videoChatInstance.init(self.peer);
+                            videoChatInstance.init(self.peer, vidoeChatCfg);
                         });
                     }     
                 });
@@ -122,7 +120,7 @@
                         socket.emit('dial',{ self:this.peer.id,room: self.peer.channel.id });
                         switchView(e.currentTarget,videoChatPage,function(){
                             var videoChatInstance = uku.getComponentController('videoChat');
-                            videoChatInstance.init(self.peer);
+                            videoChatInstance.init(self.peer, vidoeChatCfg);
                         })
                     }
                 }else{
@@ -166,7 +164,12 @@
             };
             this.cancelcallingHandler = function(e){
                 socket.emit('cancel_calling',{ self:self.peer.id,room: self.peer.channel.id });
-            }
+            };
+            var vidoeChatCfg;
+            getCfg().then(function(result){
+                //console.log(result);
+                vidoeChatCfg = result;
+            });
 
             function switchView(oldView,newView,callback){
                 $(oldView).animateCss('fadeOut', function(){
@@ -177,6 +180,14 @@
                         callback();
                     }
                 })
+            }
+
+            function getCfg(){
+                return axios.get('/config').then(function(result){
+                    return result.data;
+                }).catch(function(err){
+                    alert(err);
+                });
             }
         }
     }

@@ -1,0 +1,5 @@
+{
+    "autoExitSecond" : 30,
+    "callLimitSecond": 600,
+    "ringLimitSencon" : 50
+}

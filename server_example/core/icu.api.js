@@ -41,6 +41,11 @@ app.post('/authentication', function (req, res) {
     }
 });
 
+app.get('/config', function(req, res){
+    var cfg = JSON.parse(fs.readFileSync('config/config.json'));
+    return res.send(cfg);
+});
+
 app.get('/api/channels', function (req, res) {
     var channels = icudb.getChannels();
     res.send(channels);
