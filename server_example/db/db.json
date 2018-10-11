@@ -5,16 +5,16 @@
       "name": "Channel 1",
       "peers": [
         {
-          "id": "4Q5eY3Reu",
-          "alias": "momoko",
+          "id": "79Oupgp0T",
+          "alias": "c1 1",
           "channel": {
             "id": "c1",
             "name": "Channel 1"
           }
         },
         {
-          "id": "opP2-Fxgr",
-          "alias": "sakura"
+          "id": "tID2CgegZ",
+          "alias": "c1 2"
         }
       ]
     },
@@ -23,50 +23,28 @@
       "name": "Channel 2",
       "peers": [
         {
-          "id": "sPqBLXsue",
-          "alias": "坚果pro2",
+          "id": "Wy67pV0Hd",
+          "alias": "C2 1",
           "channel": {
             "id": "c2",
             "name": "Channel 2"
           }
         },
         {
-          "id": "IB3uUh428",
-          "alias": "huawei"
+          "id": "tFSfuAKdW",
+          "alias": "C2 2"
         }
       ]
     },
     {
       "id": "c3",
       "name": "Channel 3",
-      "peers": [
-        {
-          "id": "PZFLPEFbg",
-          "alias": "huawei m5"
-        },
-        {
-          "id": "juxISJNTa",
-          "alias": "macbook pro"
-        }
-      ]
+      "peers": []
     },
     {
       "id": "c4",
       "name": "Channel 4",
-      "peers": [
-        {
-          "id": "LqqHS9CO8",
-          "alias": "MBP",
-          "channel": {
-            "id": "c4",
-            "name": "Channel 4"
-          }
-        },
-        {
-          "id": "t_1yVxKlL",
-          "alias": "huawei m5"
-        }
-      ]
+      "peers": []
     },
     {
       "id": "c5",

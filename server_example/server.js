@@ -5,6 +5,7 @@ var easyrtc = require("../");               // EasyRTC external module
 var fs = require('fs');
 var app = require('./core/icu.api');
 var createSocketServer = require('./core/socket.api');
+var schedule = require('node-schedule');
 
 // Set process name
 process.title = "node-easyrtc";
@@ -56,8 +57,16 @@ var rtc = easyrtc.listen(app, socketServer, null, function(err, rtcRef) {
 
 //listen on port 8443
 webServer.listen(8443, function () {
-    console.log('listening on http://localhost:8443');
+    console.log('listening on 8443');
 });
-// webServer.listen(8080, function () {
-//     console.log('listening on http://localhost:8080');
-// });
+
+var rule = new schedule.RecurrenceRule();
+rule.dayOfWeek = [0,1,2,3,4,5,6];
+rule.hour = 22;
+rule.minute = 0;
+
+var refreshJob = schedule.scheduleJob(rule, function(){
+    socketServer.emit('refreshAllClient','refresh');
+    console.log('refresh all client at', new Date().toLocaleDateString());
+});
+

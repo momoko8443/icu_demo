@@ -4,7 +4,7 @@ module.exports = function(webServer){
     var socketServer = socketIo.listen(webServer, {"log level":1});
 
     socketServer.on('connection', function (socket) {
-        socket.emit('client_connected', { hello: 'world' });
+        socket.emit('client_connected', { message: 'client connected successfully' });
         socket.on('join_room', function (data) {
             console.log(data);
             socket.join(data.room);

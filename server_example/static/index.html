@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="demos/css/main.css">
     <link rel="stylesheet" href="demos/css/font-awesome/css/font-awesome.min.css">
     <script src="demos/js/socket.io/socket.io.min.js"></script>
-    <script src="demos/js/uku-routejs/build/js/uku-route.js"></script>
+    <!-- <script src="demos/js/uku-routejs/build/js/uku-route.js"></script> -->
     <script src="demos/js/ukulele/uku.js"></script>
     <script src="demos/js/jquery/jquery-3.3.1.min.js"></script>
     <script src="demos/js/jq.animate.plugin.js"></script>
@@ -108,7 +108,11 @@
                         var videoChatInstance = uku.getComponentController('videoChat');
                         videoChatInstance.reject();
                     }
-                })
+                });
+                socket.on('refreshAllClient',function(data){
+                    console.log(data);
+                    location.reload();
+                });
             }
 
             this.enterSettingHandler = function(){
