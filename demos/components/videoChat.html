@@ -134,11 +134,12 @@
                 }
                 
                 this.init = function (peer, cfg) {
+                    var room = peer.channel.id;
                     config = cfg;
                     resetFlags(cfg);
                     this.peer = peer;
                     uku.refresh();
-                    easyrtc.setVideoDims(1280, 720);
+                    easyrtc.setVideoDims(720, 720);
                     easyrtc.setUsername(peer.alias);
                     easyrtc.setRoomOccupantListener(roomOccupantHandler);
                     easyrtc.easyApp("easyrtc.audioVideoSimple", "selfVideo", ["callerVideo"],
@@ -157,7 +158,7 @@
                             console.log('login easyrtc failed');
                             easyrtc.showError(errorCode, message);
                         });
-                    var room = peer.channel.id;
+                    
 
                     easyrtc.setAcceptChecker(function (easyrtcid, acceptor) {
                         console.log('acceptor ', easyrtcid);
@@ -174,8 +175,9 @@
                     });
                     easyrtc.setPeerClosedListener(function () {
                         console.log('PeerClosed');
-                        self.currentState = 'standby';
-                        uku.refresh();
+                        //self.currentState = 'standby';
+                        //uku.refresh();
+                        self.exit();
                     });
                 };
 
@@ -211,7 +213,6 @@
                 this.hangUp = function () {
                     easyrtc.hangupAll();
                     this.currentState = 'standby';
-                    this.exit();
                 };
 
                 var _currentState;
@@ -225,7 +226,7 @@
                             timerRing = setTimeout(function(){
                                 self.reject();
                                 clearTimeout(timerRing);
-                            }, 50 * 1000);
+                            }, config.ringLimitSecond * 1000);
                         }else{
                             if(timerRing){
                                 clearTimeout(timerRing);
@@ -240,6 +241,11 @@
                             //console.log('start timer', timerAutoExit, _currentState);
                             if (timerAutoExit) {
                                 clearInterval(timerAutoExit);
+                            }
+                            if (timerCountdown) {
+                                self.time = config.callLimitSecond * 1000;
+                                self.timeDisplay = "";
+                                clearInterval(timerCountdown);
                             }
                             autoExitTimeLeft = 30;
                             timerAutoExit = setInterval(function () {      
@@ -266,14 +272,16 @@
                 });
 
                 function roomOccupantHandler(roomName, data, isPrimary) {
-                    var keys = Object.keys(data);
-                    if (keys.length === 0) {
-                        return;
-                    }
-                    callerId = keys[0];
-                    self.currentState = 'standby';
-                    self.otherClientName = easyrtc.idToName(callerId);
-                    uku.refresh();
+                    if(roomName !== "default"){
+                        var keys = Object.keys(data);
+                        if (keys.length === 0) {
+                            return;
+                        }
+                        callerId = keys[0];
+                        self.currentState = 'standby';
+                        self.otherClientName = easyrtc.idToName(callerId);
+                        uku.refresh();
+                    }  
                 }
 
                 function performCall(otherEasyrtcid) {

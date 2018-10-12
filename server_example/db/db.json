@@ -5,36 +5,19 @@
       "name": "Channel 1",
       "peers": [
         {
-          "id": "79Oupgp0T",
-          "alias": "c1 1",
-          "channel": {
-            "id": "c1",
-            "name": "Channel 1"
-          }
+          "id": "dQIWLVw62",
+          "alias": "C1_M5"
         },
         {
-          "id": "tID2CgegZ",
-          "alias": "c1 2"
+          "id": "U9jdQKSwb",
+          "alias": "C1_MBP"
         }
       ]
     },
     {
       "id": "c2",
       "name": "Channel 2",
-      "peers": [
-        {
-          "id": "Wy67pV0Hd",
-          "alias": "C2 1",
-          "channel": {
-            "id": "c2",
-            "name": "Channel 2"
-          }
-        },
-        {
-          "id": "tFSfuAKdW",
-          "alias": "C2 2"
-        }
-      ]
+      "peers": []
     },
     {
       "id": "c3",

@@ -42,7 +42,11 @@
                             self.fire('settingsdeleted');
                         })
                         .catch(function(err){
-                            console.log(err);
+                            console.log(err.response.data.message);
+                            if(err.response.status === 404){
+                                localStorage.removeItem('peer');
+                                self.fire('settingsdeleted');
+                            }
                         });
                     };
 
