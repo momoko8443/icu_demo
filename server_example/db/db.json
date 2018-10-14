@@ -5,12 +5,16 @@
       "name": "Channel 1",
       "peers": [
         {
-          "id": "dQIWLVw62",
-          "alias": "C1_M5"
+          "id": "MUqKouDkY",
+          "alias": "C1_1",
+          "channel": {
+            "id": "c1",
+            "name": "Channel 1"
+          }
         },
         {
-          "id": "U9jdQKSwb",
-          "alias": "C1_MBP"
+          "id": "o641ZqIhH",
+          "alias": "C1_2"
         }
       ]
     },
@@ -19,12 +23,16 @@
       "name": "Channel 2",
       "peers": [
         {
-          "id": "jrWuKANCH",
-          "alias": "C2_M5"
+          "id": "nYiiuWQAT",
+          "alias": "C2_MBP",
+          "channel": {
+            "id": "c2",
+            "name": "Channel 2"
+          }
         },
         {
-          "id": "fSv4RWCnn",
-          "alias": "C2_M5_2"
+          "id": "jcMqQTKCf",
+          "alias": "C2_PRO2"
         }
       ]
     },
@@ -47,7 +55,7 @@
   "users": [
     {
       "username": "admin",
-      "password": "161ebd7d45089b3446ee4e0d86dbcf92"
+      "password": "25e4ee4e9229397b6b17776bfceaf8e7"
     }
   ]
 }

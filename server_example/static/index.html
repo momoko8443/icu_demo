@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>ICU RTC</title>
     <link rel="shortcut icon" href="demos/favicon/favicon.ico" >
@@ -88,19 +89,19 @@
                     console.log(data);
                     socket.emit('join_room', { room: self.peer.channel.id });
                 });
-                socket.on('dial', function(data){
-                    if(data.self !== self.peer.id){
-                        console.log('somebody dial me!!!');
-                        switchView(welcomePage,videoChatPage,function(){
-                            var videoChatInstance = uku.getComponentController('videoChat');
-                            videoChatInstance.init(self.peer, vidoeChatCfg);
-                        });
-                    }     
-                });
+                // socket.on('dial', function(data){
+                //     if(data.self !== self.peer.id){
+                //         console.log('somebody dial me!!!');
+                //         switchView(welcomePage,videoChatPage,function(){
+                //             var videoChatInstance = uku.getComponentController('videoChat');
+                //             videoChatInstance.init(self.peer, vidoeChatCfg);
+                //         });
+                //     }     
+                // });
                 socket.on('peer_exit',function(data){
                     if(data.self !== self.peer.id && self.currentStage === 'videoChat'){
                         var videoChatInstance = uku.getComponentController('videoChat');
-                        videoChatInstance.exit();
+                        videoChatInstance.peerExit();
                     }  
                 });
                 socket.on('cancel_calling',function(data){
@@ -121,7 +122,7 @@
             this.enterEventHandler = function(e){
                 if(isRegister){
                     if(socket){
-                        socket.emit('dial',{ self:this.peer.id,room: self.peer.channel.id });
+                        //socket.emit('dial',{ self:this.peer.id,room: self.peer.channel.id });
                         switchView(e.currentTarget,videoChatPage,function(){
                             var videoChatInstance = uku.getComponentController('videoChat');
                             videoChatInstance.init(self.peer, vidoeChatCfg);

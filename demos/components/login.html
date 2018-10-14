@@ -48,11 +48,15 @@
                             .then(function (response) {
                                 //console.log(response);
                                 self.fire('loginsuccessevent');
+                                self.password = '';
+                                uku.refresh();
                             })
                             .catch(function (error) {
                                 //console.log(error);
                                 errMsg.show();
                                 errMsg.animateCss('fadeIn');
+                                self.password = '';
+                                uku.refresh();
                             });
                         }
                     };

@@ -81,6 +81,7 @@
                 </div>
             </div>
             <audio id="ring" src="demos/mp3/weixin_call.mp3" loop></audio>
+            <!-- <audio id="alert" src="demos/mp3/weixin_call.mp3"></audio> -->
         </div>
     </template>
     <script>
@@ -94,13 +95,13 @@
                 this.timeDisplay = "";
                 this.peer = null;
 
+                var room;
                 var autoExitTimeLeft;
                 var selfEasyrtcid = "";
                 var callerId = "";
                 var self = this;
                 var acceptorHandler;
                 var config;
-                var timerAutoExit;
                 var timerCountdown;
                 var timerRing;
 
@@ -130,11 +131,15 @@
                             'isActive': isActive
                         });
                     });
+                };
 
-                }
+                this.peerExit = function(){
+                    this.currentState = 'init';
+                    uku.refresh();
+                };
                 
                 this.init = function (peer, cfg) {
-                    var room = peer.channel.id;
+                    room = peer.channel.id;
                     config = cfg;
                     resetFlags(cfg);
                     this.peer = peer; 
@@ -142,24 +147,8 @@
                     easyrtc.setVideoDims(574,702);
                     easyrtc.setUsername(peer.alias);
                     easyrtc.setRoomOccupantListener(roomOccupantHandler);
-                    //alert('w'+jq('#selfVideo').width());
-                    //alert('h'+jq('#selfVideo').height());
-                    easyrtc.easyApp("easyrtc.audioVideoSimple", "selfVideo", ["callerVideo"],
-                        function loginSuccess(easyrtcid) {
-                            console.log('login easyrtc Success');
-                            selfEasyrtcid = easyrtcid;
-                            self.loadCamera = false;
-                            easyrtc.joinRoom(room, null, function successCB() {
-                                console.log('join room success');
-                            }, function failureCB(err) {
-                                console.log('join room falied', err);
-                            });
-                            uku.refresh();
-                        },
-                        function loginFailure(errorCode, message) {
-                            console.log('login easyrtc failed');
-                            easyrtc.showError(errorCode, message);
-                        });
+                    easyrtc.easyApp("easyrtc.audioVideoSimple", "selfVideo", ["callerVideo"],loginSuccess,loginFailure);
+                        
                     
 
                     easyrtc.setAcceptChecker(function (easyrtcid, acceptor) {
@@ -175,19 +164,21 @@
                             uku.refresh();
                         }
                     });
-                    easyrtc.setPeerClosedListener(function () {
+                    easyrtc.setPeerClosedListener(function (a,b,c) {
                         console.log('PeerClosed');
-                        self.exit();
+                        //self.exit();
+                        self.currentState = "standby";
+                        uku.refresh();
                     });
                 };
 
                 this.accept = function () {
                     this.currentState = 'inMeeting';
-                    acceptorHandler(true);
+                    acceptorHandler && acceptorHandler(true);
                     timerCountdown = setInterval(countdown, 1000);
                 };
                 this.reject = function () {
-                    acceptorHandler(false);
+                    acceptorHandler && acceptorHandler(false);
                     this.currentState = 'standby';
                 };
 
@@ -211,9 +202,11 @@
                 }
 
                 this.hangUp = function () {
-                    easyrtc.hangupAll();
-                    //this.currentState = 'standby';
-                    this.exit();
+                    easyrtc.hangup(callerId);
+                    //easyrtc.closeLocalMediaStream();
+                    this.currentState = 'standby';
+                    //easyrtc.easyApp("easyrtc.audioVideoSimple", "selfVideo", ["callerVideo"],loginSuccess,loginFailure);
+                    uku.refresh();
                 };
 
                 var _currentState;
@@ -239,31 +232,14 @@
                             document.getElementById('ring').pause();
                         }
                         if (_currentState === 'init' || _currentState === 'standby') {
-                            //console.log('start timer', timerAutoExit, _currentState);
-                            if (timerAutoExit) {
-                                clearInterval(timerAutoExit);
-                            }
+
                             if (timerCountdown) {
                                 self.time = config.callLimitSecond * 1000;
                                 self.timeDisplay = "";
                                 clearInterval(timerCountdown);
                             }
-                            autoExitTimeLeft = 30;
-                            timerAutoExit = setInterval(function () {      
-                                self.message = '对方已就绪, 若'+ autoExitTimeLeft +'秒内不发起通话则自动退出';
-                                autoExitTimeLeft--;
-                                uku.refresh();
-                                if(autoExitTimeLeft < 0){
-                                    self.exit();
-                                }         
-                            }, 1000);
-
-                        } else {
-                            if (timerAutoExit) {
-                                clearInterval(timerAutoExit);
-                                //console.log('clear timer', timerAutoExit, _currentState);
-                            }
-                        }
+                          
+                        } 
                         updateMessage(_currentState);
                     },
                     get() {
@@ -271,6 +247,22 @@
                     }
 
                 });
+
+                function loginSuccess(easyrtcid) {
+                    console.log('login easyrtc Success');
+                    selfEasyrtcid = easyrtcid;
+                    self.loadCamera = false;
+                    easyrtc.joinRoom(room, null, function successCB() {
+                        console.log('join room success');
+                    }, function failureCB(err) {
+                        console.log('join room falied', err);
+                    });
+                    uku.refresh();
+                }
+                function loginFailure(errorCode, message) {
+                    console.log('login easyrtc failed');
+                    easyrtc.showError(errorCode, message);
+                };
 
                 function roomOccupantHandler(roomName, data, isPrimary) {
                     if(roomName !== "default"){
@@ -335,9 +327,6 @@
                     selfEasyrtcid = "";
                     callerId = "";
                     jq('#timeleft').removeClass('six_zero_sec_left');
-                    if (timerAutoExit) {
-                        clearTimeout(timerAutoExit);
-                    }
                     if (timerCountdown) {
                         clearInterval(timerCountdown);
                     }
@@ -351,7 +340,9 @@
                     }
                     if (self.time === 0) {
                         clearInterval(timerCountdown);
-                        self.exit();
+                        //self.exit();
+                        sefl.currentState = 'standby';
+                        uku.refresh();
                     }
                 }
                 function updateMessage(state){
@@ -361,7 +352,7 @@
                             self.message = '等待对方加入...';
                             break;
                         case 'standby':
-                            self.message = '对方已就绪, 若' + autoExitTimeLeft + '秒内不发起通话则自动退出';
+                            self.message = '对方已就绪, 请发起呼叫';
                             break;
                         case 'calling':
                             self.message = '呼叫中...';
