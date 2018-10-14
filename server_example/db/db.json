@@ -17,7 +17,16 @@
     {
       "id": "c2",
       "name": "Channel 2",
-      "peers": []
+      "peers": [
+        {
+          "id": "jrWuKANCH",
+          "alias": "C2_M5"
+        },
+        {
+          "id": "fSv4RWCnn",
+          "alias": "C2_M5_2"
+        }
+      ]
     },
     {
       "id": "c3",
