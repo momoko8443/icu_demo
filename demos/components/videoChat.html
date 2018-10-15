@@ -341,7 +341,8 @@
                     if (self.time === 0) {
                         clearInterval(timerCountdown);
                         //self.exit();
-                        sefl.currentState = 'standby';
+                        self.hangUp();
+                        //self.currentState = 'standby';
                         uku.refresh();
                     }
                 }

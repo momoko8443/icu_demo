@@ -5,7 +5,7 @@ var easyrtc = require("../");               // EasyRTC external module
 var fs = require('fs');
 var app = require('./core/icu.api');
 var createSocketServer = require('./core/socket.api');
-var schedule = require('node-schedule');
+//var schedule = require('node-schedule');
 
 // Set process name
 process.title = "node-easyrtc";
@@ -13,7 +13,7 @@ process.title = "node-easyrtc";
 // Start Express http server on port 8080
 var ssl = {
     key:  fs.readFileSync("./key.pem"),
-    cert: fs.readFileSync("./cert.pem")
+    cert: fs.readFileSync("./cert.pem"),
 }
 var webServer = https.createServer(ssl,app);
 //var webServer = http.createServer(app);
@@ -60,7 +60,7 @@ webServer.listen(8443, function () {
     console.log('listening on 8443');
 });
 
-var rule = new schedule.RecurrenceRule();
+/* var rule = new schedule.RecurrenceRule();
 rule.dayOfWeek = [0,1,2,3,4,5,6];
 rule.hour = 22;
 rule.minute = 0;
@@ -68,5 +68,5 @@ rule.minute = 0;
 var refreshJob = schedule.scheduleJob(rule, function(){
     socketServer.emit('refreshAllClient','refresh');
     console.log('refresh all client at', new Date().toLocaleDateString());
-});
+}); */
 

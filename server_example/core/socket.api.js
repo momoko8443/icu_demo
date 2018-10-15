@@ -2,11 +2,17 @@ var socketIo = require("socket.io");
 
 module.exports = function(webServer){
     var socketServer = socketIo.listen(webServer, {"log level":1});
-
+    var roomMap = {};
     socketServer.on('connection', function (socket) {
         socket.emit('client_connected', { message: 'client connected successfully' });
+        socket.on('disconnect',function(data){ 
+            var roomName = roomMap[socket.id];
+            var data = {room:roomName};
+            socketServer.to(roomName).emit('peer_exit',data);
+        });
         socket.on('join_room', function (data) {
-            console.log(data);
+            var roomName = data.room;
+            roomMap[socket.id] = data.room;
             socket.join(data.room);
         });
         socket.on('dial',function(data){

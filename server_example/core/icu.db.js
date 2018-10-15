@@ -1,6 +1,5 @@
 const low = require('lowdb')
 const FileSync = require('lowdb/adapters/FileSync')
-console.log(__dirname);
 const adapter = new FileSync('./db/db.json')
 
 const db = low(adapter)
