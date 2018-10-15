@@ -39,7 +39,12 @@
     {
       "id": "c3",
       "name": "Channel 3",
-      "peers": []
+      "peers": [
+        {
+          "id": "E_DEIhXA4",
+          "alias": "C3_MBP"
+        }
+      ]
     },
     {
       "id": "c4",

@@ -7,11 +7,11 @@
                         <form class="pure-form">
                             <fieldset>
                                 <legend>终端名</legend>
-                                <h4>{{cc.myPeer.alias}}</h4>
+                                <h4 uku-text="cc.myPeer.alias"></h4>
                             </fieldset>
                             <fieldset>
                                 <legend>频道</legend>
-                                <h4>{{ cc.myPeer.channel? cc.myPeer.channel.name : ''}}</h4>
+                                <h4 uku-text="cc.myPeer.channel? cc.myPeer.channel.name : ''"></h4>
                             </fieldset>
                             <fieldset>
                                 <button type="button" class="pure-button pure-button-primary" style="margin-right: 50px" uku-onclick="cc.exit()">退出频道</a>

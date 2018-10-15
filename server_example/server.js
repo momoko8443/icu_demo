@@ -12,8 +12,9 @@ process.title = "node-easyrtc";
 
 // Start Express http server on port 8080
 var ssl = {
-    key:  fs.readFileSync("./key.pem"),
-    cert: fs.readFileSync("./cert.pem"),
+    key:  fs.readFileSync("./ssl/icuts.key"),
+    cert: fs.readFileSync("./ssl/icuts.crt"),
+    pfk: fs.readFileSync("./ssl/icuts.pfx")
 }
 var webServer = https.createServer(ssl,app);
 //var webServer = http.createServer(app);

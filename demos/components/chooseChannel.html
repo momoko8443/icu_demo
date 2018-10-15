@@ -12,11 +12,10 @@
                             <fieldset>
                                 <legend>选择频道</legend>
                                 <select style="width: 190px;" uku-selected="cc.selectedChannel|name" uku-onchange="cc.hiddenErrorMsg()">
-                                    <option uku-repeat="channel in cc.availableChannels" uku-value="channel.name" uku-data-item="channel">{{channel.displayName}}</option>
+                                    <option uku-repeat="channel in cc.availableChannels" uku-value="channel.name" uku-data-item="channel" uku-text="channel.displayName"></option>
                                 </select>
                             </fieldset>
-                            <span id="errorMsg" class="errorMsg">
-                                {{cc.errorMsg}}
+                            <span id="errorMsg" class="errorMsg" uku-text="cc.errorMs">
                             </span>
                             <fieldset>
                                 <button type="button" class="pure-button pure-button-primary" style="margin-right: 50px" uku-onclick="cc.save()">进入频道</a>

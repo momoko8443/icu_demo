@@ -18,21 +18,12 @@
         <script>
             (function(){
                 return function(uku){
-                    this.isFullScreen = false;
-                    
-                    this.fullScreen = function () {
-                        document.documentElement.webkitRequestFullScreen();
-                        this.isFullScreen = true;
-                    };
 
                     this.setting = function(){
                         this.fire('entersettings');
                     };
 
                     this.enter = function(){
-                        if(!this.isFullScreen){
-                            this.fullScreen();
-                        }
                         this.fire('enterevent');
                     };
                 };

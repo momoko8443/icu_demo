@@ -122,8 +122,6 @@
                 this.exit = function (e, isActive) {
                     resetFlags(config);
                     var room = self.peer.channel.id;
-                    easyrtc.leaveRoom(room);
-                    easyrtc.disconnect();
                     this.currentState = "exit";
                     easyrtc.setDisconnectListener(function () {
                         easyrtc.closeLocalMediaStream();
@@ -131,6 +129,8 @@
                             'isActive': isActive
                         });
                     });
+                    easyrtc.leaveRoom(room);
+                    easyrtc.disconnect();
                 };
 
                 this.peerExit = function(){

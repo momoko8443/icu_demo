@@ -1,0 +1,15 @@
+{
+    "background_color": "green",
+    "description": "",
+    "display": "fullscreen",
+    "icons": [
+      {
+        "src": "/demos/images/icu/icon.png",
+        "sizes": "192x192",
+        "type": "image/png"
+      }
+    ],
+    "name": "ICU视频探视系统",
+    "short_name": "ICUTS",
+    "start_url": "index.html"
+  }
