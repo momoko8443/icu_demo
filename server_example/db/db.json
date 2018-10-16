@@ -5,16 +5,12 @@
       "name": "Channel 1",
       "peers": [
         {
-          "id": "5GWoKD3ge",
-          "alias": "C1_1",
-          "channel": {
-            "id": "c1",
-            "name": "Channel 1"
-          }
+          "id": "mPBsE-_hk",
+          "alias": "C1_2"
         },
         {
-          "id": "_Qb7zqqEW",
-          "alias": "C1_2"
+          "id": "UfrceVzKA",
+          "alias": "C1_1"
         }
       ]
     },
@@ -29,10 +25,6 @@
             "id": "c2",
             "name": "Channel 2"
           }
-        },
-        {
-          "id": "jcMqQTKCf",
-          "alias": "C2_PRO2"
         }
       ]
     },

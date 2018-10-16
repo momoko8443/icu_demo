@@ -67,6 +67,7 @@
         var chooseChannelPage;
         var exitChannelPage;
         var videoChatPage;
+        var isPassiveRefresh = false;
         this.init = function(){
             welcomePage = document.getElementById('welcome');
             loginPage = document.getElementById('login');
@@ -74,6 +75,10 @@
             exitChannelPage = document.getElementById('exitChannel');
             videoChatPage = document.getElementById('videoChat');
 
+            if(getParamsFromURL()['passive'] === "true"){
+                isPassiveRefresh = true;
+            }
+            
             if(localStorage.getItem('peer')){
                 isRegister = true;
                 try{
@@ -119,12 +124,14 @@
                     if(socket){
                         switchView(e.currentTarget,videoChatPage,function(){
                             var videoChatInstance = uku.getComponentController('videoChat');
-                            videoChatInstance.init(self.peer, vidoeChatCfg);
+                            videoChatInstance.init(self.peer, vidoeChatCfg, isPassiveRefresh);
                             callback();
                         })
                     }
                 }else{
-                    switchView(e.currentTarget, loginPage);
+                    switchView(e.currentTarget, loginPage, function(){
+                        callback();
+                    });
                 }
             }
 
@@ -190,6 +197,21 @@
                 }).catch(function(err){
                     alert(err);
                 });
+            }
+
+            function getParamsFromURL(){
+                var result = {};
+                if(location.href.split('?').length > 1){
+                    var paramsString = location.href.split('?')[1];
+                    var params = paramsString.split('&');
+                    for(var i=0;i<params.length;i++){
+                        var param = params[i];
+                        var key = param.split('=')[0];
+                        var value = param.split('=')[1];
+                        result[key] = value;
+                    }
+                }
+                return result;
             }
         }
     }
