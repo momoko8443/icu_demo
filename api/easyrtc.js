@@ -6030,7 +6030,7 @@ var Easyrtc = function() {
         messageNode.className = 'easyrtcErrorDialog_element';
         messageNode.appendChild(document.createTextNode(errorObject.errorText));
         errorBody.appendChild(messageNode);
-        errorDiv.style.display = "block";
+        errorDiv.style.display = "none";
     };
 
     /** @private

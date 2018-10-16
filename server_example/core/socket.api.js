@@ -26,7 +26,12 @@ module.exports = function(webServer){
         socket.on('cancel_calling',function(data){
             var room = data.room;
             socketServer.to(room).emit('cancel_calling',data);
-        })
+        });
+        socket.on('hangup_call',function(data){
+            var room = data.room;
+            socketServer.to(room).emit('hangup_call',data);
+        });
+
     });
     return socketServer;
 }

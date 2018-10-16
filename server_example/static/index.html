@@ -7,6 +7,7 @@
     <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta http-equiv="pragma" content="no-cache">
     <title>ICU RTC</title>
     <link rel="icon" sizes="192x192" href="demos/images/icu/icon.png">
     <link rel="shortcut icon" href="demos/favicon/favicon.ico" >
@@ -39,8 +40,13 @@
         uku-oncancelchoosechannel="appCtrl.cancelChooseChannelHandler()"></choose-channel>
     <video-chat id="videoChat" uku-render="appCtrl.currentStage === 'videoChat'"
         uku-oncancelcalling="appCtrl.cancelcallingHandler()"
-        uku-onexitvideochat="appCtrl.exitVideoChatHandler()"></video-chat>
-    <!-- <video-chat id="videoChat" uku-render="appCtrl.currentStage === 'videoChat'"></video-chat> -->
+        uku-onexitvideochat="appCtrl.exitVideoChatHandler()"
+        uku-onhangupcall="appCtrl.hangUpCallHandler()"></video-chat>
+    <audio id="ring" volume="0.5" src="demos/mp3/weixin_call.mp3" loop></audio>
+    <!-- <div id="debug">
+        
+    </div> -->
+
 </body>
 <script>
     var uku = new Ukulele();
@@ -67,17 +73,13 @@
         var chooseChannelPage;
         var exitChannelPage;
         var videoChatPage;
-        var isPassiveRefresh = false;
+
         this.init = function(){
             welcomePage = document.getElementById('welcome');
             loginPage = document.getElementById('login');
             chooseChannelPage = document.getElementById('chooseChannel');
             exitChannelPage = document.getElementById('exitChannel');
             videoChatPage = document.getElementById('videoChat');
-
-            if(getParamsFromURL()['passive'] === "true"){
-                isPassiveRefresh = true;
-            }
             
             if(localStorage.getItem('peer')){
                 isRegister = true;
@@ -114,6 +116,12 @@
                     console.log(data);
                     location.reload();
                 });
+                socket.on('hangup_call', function(data){
+                    if(data.self !== self.peer.id && self.currentStage === 'videoChat'){
+                        var videoChatInstance = uku.getComponentController('videoChat');
+                        videoChatInstance.beHangUp();
+                    } 
+                });
             }
 
             this.enterSettingHandler = function(){
@@ -124,7 +132,7 @@
                     if(socket){
                         switchView(e.currentTarget,videoChatPage,function(){
                             var videoChatInstance = uku.getComponentController('videoChat');
-                            videoChatInstance.init(self.peer, vidoeChatCfg, isPassiveRefresh);
+                            videoChatInstance.init(self.peer, vidoeChatCfg);
                             callback();
                         })
                     }
@@ -170,6 +178,9 @@
             this.cancelcallingHandler = function(e){
                 socket.emit('cancel_calling',{ self:self.peer.id,room: self.peer.channel.id });
             };
+            this.hangUpCallHandler = function(){
+                socket.emit('hangup_call',{ self:self.peer.id,room: self.peer.channel.id });
+            }
             var vidoeChatCfg;
             getCfg().then(function(result){
                 //console.log(result);
@@ -197,21 +208,6 @@
                 }).catch(function(err){
                     alert(err);
                 });
-            }
-
-            function getParamsFromURL(){
-                var result = {};
-                if(location.href.split('?').length > 1){
-                    var paramsString = location.href.split('?')[1];
-                    var params = paramsString.split('&');
-                    for(var i=0;i<params.length;i++){
-                        var param = params[i];
-                        var key = param.split('=')[0];
-                        var value = param.split('=')[1];
-                        result[key] = value;
-                    }
-                }
-                return result;
             }
         }
     }

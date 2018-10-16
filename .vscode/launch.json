@@ -9,7 +9,7 @@
             "request": "launch",
             "name": "启动程序",
             "runtimeExecutable": "${env:HOME}/.nvm/versions/node/v8.9.4/bin/node",
-            "program": "${workspaceFolder}/server_example/server.js",
+            "program": "${workspaceFolder}/server_example/server_dev.js",
             "cwd": "${workspaceFolder}/server_example"
         }
     ]

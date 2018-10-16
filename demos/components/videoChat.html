@@ -80,8 +80,6 @@
                     </div>
                 </div>
             </div>
-            <audio id="ring" src="demos/mp3/weixin_call.mp3" loop></audio>
-            <!-- <audio id="alert" src="demos/mp3/weixin_call.mp3"></audio> -->
         </div>
     </template>
     <script>
@@ -142,7 +140,7 @@
                     room = peer.channel.id;
                     config = cfg;
                     resetFlags(cfg);
-                    this.peer = peer; 
+                    this.peer = peer;
                     uku.refresh();
                     easyrtc.setVideoDims(574,702);
                     easyrtc.setUsername(peer.alias);
@@ -163,12 +161,6 @@
                             self.currentState = 'standby';
                             uku.refresh();
                         }
-                    });
-                    easyrtc.setPeerClosedListener(function (a,b,c) {
-                        console.log('PeerClosed');
-                        //self.exit();
-                        self.currentState = "standby";
-                        uku.refresh();
                     });
                 };
 
@@ -203,11 +195,15 @@
 
                 this.hangUp = function () {
                     easyrtc.hangup(callerId);
-                    //easyrtc.closeLocalMediaStream();
                     this.currentState = 'standby';
-                    //easyrtc.easyApp("easyrtc.audioVideoSimple", "selfVideo", ["callerVideo"],loginSuccess,loginFailure);
+                    this.fire('hangupcall');
                     uku.refresh();
                 };
+
+                this.beHangUp = function () {
+                    this.currentState = 'standby';
+                    uku.refresh();
+                }
 
                 var _currentState;
                 Object.defineProperty(this, 'currentState', {
@@ -231,15 +227,13 @@
                         } else {
                             document.getElementById('ring').pause();
                         }
-                        if (_currentState === 'init' || _currentState === 'standby') {
-
-                            if (timerCountdown) {
-                                self.time = config.callLimitSecond * 1000;
-                                self.timeDisplay = "";
-                                clearInterval(timerCountdown);
-                            }
+                        if ( _currentState === 'standby') {
+                            resetFlagsStandby(config);
                           
                         } 
+                        if ( _currentState === 'init') {
+                            resetFlags(config);
+                        }
                         updateMessage(_currentState);
                     },
                     get() {
@@ -321,11 +315,20 @@
                     self.message = '等待对方加入...';
                     self.message2 = '';
                     self.loadCamera = true;
-                    self.currentState = 'init';
                     self.time = cfg.callLimitSecond * 1000;
                     self.timeDisplay = "";
                     selfEasyrtcid = "";
                     callerId = "";
+                    jq('#timeleft').removeClass('six_zero_sec_left');
+                    if (timerCountdown) {
+                        clearInterval(timerCountdown);
+                    }
+                }
+
+                function resetFlagsStandby(cfg) {
+                    autoExitTimeLeft = cfg.autoExitSecond;
+                    self.time = cfg.callLimitSecond * 1000;
+                    self.timeDisplay = "";
                     jq('#timeleft').removeClass('six_zero_sec_left');
                     if (timerCountdown) {
                         clearInterval(timerCountdown);
@@ -340,9 +343,7 @@
                     }
                     if (self.time === 0) {
                         clearInterval(timerCountdown);
-                        //self.exit();
                         self.hangUp();
-                        //self.currentState = 'standby';
                         uku.refresh();
                     }
                 }
