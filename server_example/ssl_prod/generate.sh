@@ -1,0 +1,2 @@
+openssl req -config icuts_prod.conf -new -x509 -sha256 -newkey rsa:2048 -nodes -keyout icuts_prod.key -days 3650 -out icuts_prod.crt &&
+openssl pkcs12 -export -out icuts_prod.pfx -inkey icuts_prod.key -in icuts_prod.crt

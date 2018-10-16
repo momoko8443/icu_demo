@@ -24,7 +24,7 @@
     <script src="demos/js/axios/axios.min.js"></script>
     <script src="/easyrtc/easyrtc.js"></script>
 </head>
-<body uku-application style="height: 100%;background-color: darkslategrey;display: none">
+<body uku-application style="height: 100%;background-color: darkslategrey;visibility: hidden">
     <welcome id="welcome" uku-render="appCtrl.currentStage === 'welcome'" 
         uku-onentersettings="appCtrl.enterSettingHandler()"
         uku-onenterevent="appCtrl.enterEventHandler()"></welcome>
@@ -114,12 +114,13 @@
             this.enterSettingHandler = function(){
                 switchView(welcomePage,loginPage);
             };
-            this.enterEventHandler = function(e){
+            this.enterEventHandler = function(e, callback){
                 if(isRegister){
                     if(socket){
                         switchView(e.currentTarget,videoChatPage,function(){
                             var videoChatInstance = uku.getComponentController('videoChat');
                             videoChatInstance.init(self.peer, vidoeChatCfg);
+                            callback();
                         })
                     }
                 }else{
@@ -166,8 +167,10 @@
             getCfg().then(function(result){
                 //console.log(result);
                 vidoeChatCfg = result;
-                self.enterEventHandler({currentTarget:welcomePage});
-                $('body').css('display','block');
+                self.enterEventHandler({currentTarget:welcomePage}, function(){
+                    $('body').css('visibility','visible');
+                });
+                
             });
 
             function switchView(oldView,newView,callback){

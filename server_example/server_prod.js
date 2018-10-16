@@ -1,7 +1,7 @@
 // Load required modules
 var http    = require("http"); 
 var https   = require("https");                  // http server core module
-var easyrtc = require("../");               // EasyRTC external module
+var easyrtc = require("..");               // EasyRTC external module
 var fs = require('fs');
 var app = require('./core/icu.api');
 var createSocketServer = require('./core/socket.api');
@@ -12,9 +12,9 @@ process.title = "node-easyrtc";
 
 // Start Express http server on port 8080
 var ssl = {
-    key:  fs.readFileSync("./ssl/icuts.key"),
-    cert: fs.readFileSync("./ssl/icuts.crt"),
-    pfk: fs.readFileSync("./ssl/icuts.pfx")
+    key:  fs.readFileSync("./ssl_prod/icuts_prod.key"),
+    cert: fs.readFileSync("./ssl_prod/icuts_prod.crt"),
+    pfk: fs.readFileSync("./ssl_prod/icuts_prod.pfx")
 }
 var webServer = https.createServer(ssl,app);
 //var webServer = http.createServer(app);
@@ -57,8 +57,8 @@ var rtc = easyrtc.listen(app, socketServer, null, function(err, rtcRef) {
 });
 
 //listen on port 8443
-webServer.listen(8443, function () {
-    console.log('listening on 8443');
+webServer.listen(443, function () {
+    console.log('listening on 443');
 });
 
 /* var rule = new schedule.RecurrenceRule();
