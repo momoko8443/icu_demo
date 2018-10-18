@@ -8,16 +8,7 @@
     {
       "id": "c2",
       "name": "北部 02",
-      "peers": [
-        {
-          "id": "A6mOZyFeL",
-          "alias": "C2_mac",
-          "channel": {
-            "id": "c2",
-            "name": "北部 02"
-          }
-        }
-      ]
+      "peers": []
     },
     {
       "id": "c3",
@@ -57,20 +48,7 @@
     {
       "id": "c10",
       "name": "南部 01",
-      "peers": [
-        {
-          "id": "eKPtVXsLU",
-          "alias": "N1_MAC",
-          "channel": {
-            "id": "c10",
-            "name": "南部 01"
-          }
-        },
-        {
-          "id": "zr1KA7aP8",
-          "alias": "N1_PRO2"
-        }
-      ]
+      "peers": []
     },
     {
       "id": "c11",

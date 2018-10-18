@@ -121,14 +121,15 @@
                     resetFlags(config);
                     var room = self.peer.channel.id;
                     this.currentState = "exit";
-                    easyrtc.setDisconnectListener(function () {
-                        easyrtc.closeLocalMediaStream();
-                        self.fire('exitvideochat', {
-                            'isActive': isActive
-                        });
-                    });
+                    // easyrtc.setDisconnectListener(function () {
+                        
+                    // });
                     easyrtc.leaveRoom(room);
                     easyrtc.disconnect();
+                    easyrtc.closeLocalMediaStream();
+                    self.fire('exitvideochat', {
+                        'isActive': isActive
+                    }); 
                 };
 
                 this.peerExit = function(){
@@ -145,6 +146,19 @@
                     easyrtc.setVideoDims(574,702);
                     easyrtc.setUsername(peer.alias);
                     easyrtc.setRoomOccupantListener(roomOccupantHandler);
+                    var localFilter = easyrtc.buildLocalSdpFilter( {
+                        // audioRecvCodec:"G.711",
+                        audioRecvBitrate : 20,
+                        videoRecvBitrate : 2000
+                    });
+                    var remoteFilter = easyrtc.buildRemoteSdpFilter({
+                        stereo : false,
+                        // audioSendCodec:"G.711",
+                        audioSendBitrate : 20,
+                        videoSendBitrate: 2000,
+                        videoSendInitialBitRate : 2000
+                    });
+                    easyrtc.setSdpFilters(localFilter, remoteFilter);
                     easyrtc.easyApp("easyrtc.audioVideoSimple", "selfVideo", ["callerVideo"],loginSuccess,loginFailure);
                         
                     
