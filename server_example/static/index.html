@@ -134,12 +134,12 @@
                         switchView(e.currentTarget,videoChatPage,function(){
                             var videoChatInstance = uku.getComponentController('videoChat');
                             videoChatInstance.init(self.peer, vidoeChatCfg);
-                            callback();
+                            callback && callback();
                         })
                     }
                 }else{
                     switchView(e.currentTarget, loginPage, function(){
-                        callback();
+                        callback && callback();
                     });
                 }
             }
