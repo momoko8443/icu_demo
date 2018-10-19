@@ -14,7 +14,6 @@
                 <video autoplay="autoplay" playsinline="playsinline" style="height: 100%;width: 100%" id="callerVideo"></video>
                 <div class="videoFrame2">
                     <video autoplay="autoplay" playsinline="playsinline" style="width: 100%;height:100%;" id="selfVideo" muted="muted" volume="0"></video>
-                    <h4 uku-render="cc.currentState==='inMeeting'" id="timeleft" style="color:white;text-align: center">{{'剩余: ' + cc.timeDisplay}}</h4>
                 </div>
 
                 <div class="console">
@@ -58,6 +57,7 @@
                         </div>
                         <div uku-render="cc.currentState==='inMeeting'">
                             <!-- <h2 id="timeleft" class="post-title">{{'剩余: ' + cc.timeDisplay}}</h2> -->
+                            <h4 uku-render="cc.currentState==='inMeeting'" id="timeleft" style="text-align: center">{{'剩余: ' + cc.timeDisplay}}</h4>
                             <button type="button" class="pure-button button-error" uku-onclick="cc.hangUp()">
                                 <i class="fa fa-ban" style="font-size:3em">
                                     <!-- 挂断 -->
@@ -204,7 +204,7 @@
                         videoSendBitrate: 2000,
                         videoSendInitialBitRate : 2000
                     });
-                    easyrtc.setSdpFilters(localFilter, remoteFilter);
+                    //easyrtc.setSdpFilters(localFilter, remoteFilter);
                     easyrtc.easyApp("easyrtc.audioVideoSimple", "selfVideo", ["callerVideo"],loginSuccess,loginFailure);
                         
                     
@@ -422,6 +422,7 @@
                     self.timeDisplayFunc();
                     if (self.time === 60 * 1000) {
                         jq('#timeleft').addClass('six_zero_sec_left');
+                        document.getElementById('warning').play();
                     }
                     if (self.time === 0) {
                         clearInterval(timerCountdown);

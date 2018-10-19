@@ -1,4 +1,4 @@
-html, body{ margin:0; height:100%; }
+html, body{ margin:0; height:100%; overflow: hidden;}
 div{
     /* border: 1px red solid; */
     box-sizing: border-box;
@@ -24,6 +24,7 @@ video{
     position: absolute;
     top: 10px;
     right: 10px;
+    color: white;
 }
 
 .main{
