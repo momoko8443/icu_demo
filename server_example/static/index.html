@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 
 <html lang="en">
 <head>
@@ -96,7 +95,7 @@
                     alert(JSON.stringify(e));
                     return;
                 }
-                
+
                 socket = io(location.href);
                 socket.on('client_connected', function (data) {
                     console.log(data);

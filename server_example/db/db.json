@@ -10,12 +10,16 @@
       "name": "北部 02",
       "peers": [
         {
-          "id": "A6mOZyFeL",
-          "alias": "C2_mac",
+          "id": "a-HQhUT3b",
+          "alias": "B02-mac",
           "channel": {
             "id": "c2",
             "name": "北部 02"
           }
+        },
+        {
+          "id": "1WRheDUax",
+          "alias": "B2-ff"
         }
       ]
     },
@@ -73,12 +77,42 @@
     {
       "id": "c8",
       "name": "北部 08",
-      "peers": []
+      "peers": [
+        {
+          "id": "Thw2ELLx9",
+          "alias": "08-ff",
+          "channel": {
+            "id": "c8",
+            "name": "北部 08"
+          }
+        },
+        {
+          "id": "UDaDVscVg",
+          "alias": "08-chrome"
+        }
+      ]
     },
     {
       "id": "c9",
       "name": "北部 09",
-      "peers": []
+      "peers": [
+        {
+          "id": "YXe9X9gri",
+          "alias": "09-pro2",
+          "channel": {
+            "id": "c9",
+            "name": "北部 09"
+          }
+        },
+        {
+          "id": "2baX6RRHB",
+          "alias": "09-mac",
+          "channel": {
+            "id": "c9",
+            "name": "北部 09"
+          }
+        }
+      ]
     },
     {
       "id": "c10",

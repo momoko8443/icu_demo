@@ -61,11 +61,11 @@ app.post('/api/channels/:channelid/peers', function (req, res) {
     var channel = icudb.getChannel(channelId);
     if (channel) {
         if (channel.peers.length < 2) {
-            icudb.addPeer(channelId,peer);
             peer.channel = {
                 id: channel.id,
                 name: channel.name
             };
+            icudb.addPeer(channelId,peer);
             res.send(peer);
         } else {
             //peer full

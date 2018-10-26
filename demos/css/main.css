@@ -110,3 +110,8 @@ video{
 .six_zero_sec_left{
     color: red;
 }
+#bitrateDiv{
+    position: absolute;
+    bottom: 5px;
+    left: 20px;
+}

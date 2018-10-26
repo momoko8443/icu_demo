@@ -14,114 +14,44 @@
                 <video autoplay="autoplay" playsinline="playsinline" style="height: 100%;width: 100%" id="callerVideo"></video>
                 <div class="videoFrame2">
                     <video autoplay="autoplay" playsinline="playsinline" style="width: 100%;height:100%;" id="selfVideo" muted="muted" volume="0"></video>
+                    <div id="bitrateDiv"></div>
                 </div>
 
                 <div class="console">
                     <div class="buttonBox">
                         <div uku-render="cc.currentState ==='standby'">
                             <button type="button" class="pure-button button-success" uku-onclick="cc.call()">
-                                <!-- <i class="fa fa-phone fa-lg">{{' 呼叫 ' + cc.otherClientName}}</i> -->
+                                <!-- 呼叫 -->
                                 <i class="fa fa-phone" style="font-size:3em"></i>
                             </button>
                         </div>
                         <div uku-render="cc.currentState ==='calling'">
-                            <!-- <h3 class="post-title">
-                                <i class="fa fa-spinner fa-pulse"></i>
-                                <span>
-                                    {{'正在呼叫 '+ cc.otherClientName}}
-                                </span>
-                            </h3> -->
                             <button type="button" class="pure-button button-error" uku-onclick="cc.cancelCall()">
-                                <i class="fa fa-ban" style="font-size:3em">
-                                    <!-- 取消呼叫 -->
-                                </i>
+                                 <!-- 取消呼叫 -->
+                                <i class="fa fa-ban" style="font-size:3em"></i>
                             </button>
                         </div>
                         <div uku-render="cc.currentState==='called'">
-                            <!-- <h3 class="post-title">
-                                <i class="fa fa-spinner fa-pulse"></i>
-                                <span>
-                                    {{'来自 ' + cc.callerName + '呼叫'}}
-                                </span>
-                            </h3> -->
                             <button type="button" class="pure-button button-success" style="margin-right:20px" uku-onclick="cc.accept()">
-                                <i class="fa fa-phone" style="font-size:3em">
-                                    <!-- 接听 -->
-                                </i>
+                                <!-- 接听 -->
+                                <i class="fa fa-phone" style="font-size:3em"></i>
                             </button>
                             <button type="button" class="pure-button button-error" style="margin-left:20px" uku-onclick="cc.reject()">
-                                <i class="fa fa-ban" style="font-size:3em">
-                                    <!-- 拒绝 -->
-                                </i>
+                                <!-- 拒绝 -->
+                                <i class="fa fa-ban" style="font-size:3em"></i>
                             </button>
                         </div>
                         <div uku-render="cc.currentState==='inMeeting'">
-                            <!-- <h2 id="timeleft" class="post-title">{{'剩余: ' + cc.timeDisplay}}</h2> -->
-                            <h4 uku-render="cc.currentState==='inMeeting'" id="timeleft" style="text-align: center">{{'剩余: ' + cc.timeDisplay}}</h4>
+                            <!-- 剩余时间 -->
+                            <h4 id="timeleft" style="text-align: center; -webkit-text-stroke-color: black;text-shadow: 2px 2px 2px #000000;">{{'剩余: ' + cc.timeDisplay}}</h4>
                             <button type="button" class="pure-button button-error" uku-onclick="cc.hangUp()">
-                                <i class="fa fa-ban" style="font-size:3em">
-                                    <!-- 挂断 -->
-                                </i>
+                                <!-- 挂断 -->
+                                <i class="fa fa-ban" style="font-size:3em"></i>
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
-
-                
-                    <!-- <div class="console">
-                        <div class="buttonBox">
-                            <div uku-render="cc.currentState ==='standby'">
-                                <button type="button" class="pure-button button-success" uku-onclick="cc.call()">
-                                    <i class="fa fa-phone fa-lg">{{' 呼叫 ' + cc.otherClientName}}</i>
-                                </button>
-                            </div>
-                            <div uku-render="cc.currentState ==='calling'">
-                                <h3 class="post-title">
-                                    <i class="fa fa-spinner fa-pulse"></i>
-                                    <span>
-                                        {{'正在呼叫 '+ cc.otherClientName}}
-                                    </span>
-                                </h3>
-                                <button type="button" class="pure-button button-error" uku-onclick="cc.cancelCall()">
-                                    <i class="fa fa-ban fa-lg">
-                                        取消呼叫
-                                    </i>
-                                </button>
-                            </div>
-                            <div uku-render="cc.currentState==='called'">
-                                <h3 class="post-title">
-                                    <i class="fa fa-spinner fa-pulse"></i>
-                                    <span>
-                                        {{'来自 ' + cc.callerName + '呼叫'}}
-                                    </span>
-                                </h3>
-                                <button type="button" class="pure-button button-success" style="margin-top:10px" uku-onclick="cc.accept()">
-                                    <i class="fa fa-phone fa-lg">
-                                        接听
-                                    </i>
-                                </button>
-                                <button type="button" class="pure-button button-error" style="margin-top:10px" uku-onclick="cc.reject()">
-                                    <i class="fa fa-ban fa-lg">
-                                        拒绝
-                                    </i>
-                                </button>
-                            </div>
-                            <div uku-render="cc.currentState==='inMeeting'">
-                                <h2 class="post-title">剩余通话时间</h2>
-                                <h2 id="timeleft" class="post-title">{{cc.timeDisplay}}</h2>
-                                <button type="button" class="pure-button button-error" uku-onclick="cc.hangUp()">
-                                    <i class="fa fa-ban fa-lg">
-                                        结束通话
-                                    </i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="exitBtn">
-                            <i class="fa fa-window-close-o fa-lg" uku-onclick="cc.exit(true)"></i>
-                        </div> 
-                    </div> -->
-
         </div>
     </template>
     <script>
@@ -144,7 +74,10 @@
                 var config;
                 var timerCountdown;
                 var timerRing;
-
+                var selfVideoDom;
+                let timestampPrev;
+                let bytesPrev;
+                let devicePixleRatio = 2;
                 this.timeDisplayFunc = function () {
                     var tmp = new Date(this.time);
                     var min = tmp.getMinutes();
@@ -166,12 +99,16 @@
                     // easyrtc.setDisconnectListener(function () {
                         
                     // });
-                    easyrtc.leaveRoom(room);
-                    easyrtc.disconnect();
-                    easyrtc.closeLocalMediaStream();
-                    self.fire('exitvideochat', {
-                        'isActive': isActive
-                    }); 
+                    easyrtc.leaveRoom(room, 
+                        function successCB(roomName){
+                            easyrtc.disconnect();
+                        }, 
+                        function failCB(errorCode, errorText, roomName){
+                            alert('Leave room: '+ roomName + 'failed. ' +errorCode + ' ' + errorText);
+                        }
+                    );
+                    
+                    
                 };
 
                 this.peerExit = function(){
@@ -182,8 +119,9 @@
                 this.init = function (peer, cfg) {
                     //alert('w '+$('body').width());
                     //alert('h '+$('body').height());
-                    var videoW = $('body').width();
-                    var videoH = $('body').height();
+                    selfVideoDom = document.getElementById('selfVideo');
+                    var videoW = $('body').width() * devicePixleRatio;
+                    var videoH = $('body').height() * devicePixleRatio;
                     room = peer.channel.id;
                     config = cfg;
                     resetFlags(cfg);
@@ -192,19 +130,25 @@
                     easyrtc.setVideoDims(videoW,videoH);
                     easyrtc.setUsername(peer.alias);
                     easyrtc.setRoomOccupantListener(roomOccupantHandler);
+                    easyrtc.setDisconnectListener(function () {
+                        easyrtc.closeLocalMediaStream();
+                        self.fire('exitvideochat'); 
+                    });
                     var localFilter = easyrtc.buildLocalSdpFilter( {
                         // audioRecvCodec:"G.711",
-                        audioRecvBitrate : 20,
-                        videoRecvBitrate : 2000
+                        //videoRecvCodec:"H264",
+                        audioRecvBitrate : 1000,
+                        videoRecvBitrate : 5000
                     });
                     var remoteFilter = easyrtc.buildRemoteSdpFilter({
                         stereo : false,
                         // audioSendCodec:"G.711",
-                        audioSendBitrate : 20,
-                        videoSendBitrate: 2000,
+                        //videoSendCodec:"H264",
+                        audioSendBitrate : 1000,
+                        videoSendBitrate: 5000,
                         videoSendInitialBitRate : 2000
                     });
-                    //easyrtc.setSdpFilters(localFilter, remoteFilter);
+                    easyrtc.setSdpFilters(localFilter, remoteFilter);
                     easyrtc.easyApp("easyrtc.audioVideoSimple", "selfVideo", ["callerVideo"],loginSuccess,loginFailure);
                         
                     
@@ -268,6 +212,9 @@
                 var timerEditMode;
                 var touchedCount = 0;
                 this.touchEndHandler = function(e){
+                    if(e.target !== selfVideoDom){
+                        return;
+                    }
                     if(touchedCount === 0){
                         timerEditMode = setTimeout(function(){   
                             touchedCount = 0;
@@ -310,7 +257,6 @@
                         }
                         if ( _currentState === 'standby') {
                             resetFlagsStandby(config);
-                          
                         } 
                         if ( _currentState === 'init') {
                             resetFlags(config);
@@ -392,6 +338,8 @@
                 }
 
                 function resetFlags(cfg) {
+                    timestampPrev = 0;
+                    bytesPrev = 0;
                     touchedCount = 0;
                     autoExitTimeLeft = cfg.autoExitSecond;
                     self.message = '等待对方加入...';
@@ -405,6 +353,7 @@
                     if (timerCountdown) {
                         clearInterval(timerCountdown);
                     }
+                    jq('#bitrateDiv').html('');
                 }
 
                 function resetFlagsStandby(cfg) {
@@ -415,8 +364,9 @@
                     if (timerCountdown) {
                         clearInterval(timerCountdown);
                     }
+                    jq('#bitrateDiv').html('');
                 }
-
+                
                 function countdown() {
                     self.time -= 1000;
                     self.timeDisplayFunc();
@@ -429,12 +379,39 @@
                         self.hangUp();
                         uku.refresh();
                     }
+                    //var peer = easyrtc.getPeerConnectionByUserId(callerId);
+                    easyrtc.getPeerConnectionByUserId(callerId).getStats(null)
+                    .then(
+                        function(results){
+                            results.forEach(report => {
+                                const now = report.timestamp;
+
+                                let bitrate;
+                                if (report.type === 'inbound-rtp' && report.mediaType === 'video') {
+                                const bytes = report.bytesReceived;
+                                if (timestampPrev) {
+                                    bitrate = 8 * (bytes - bytesPrev) / (now - timestampPrev);
+                                    bitrate = Math.floor(bitrate);
+                                }
+                                bytesPrev = bytes;
+                                timestampPrev = now;
+                                }
+                                if (bitrate) {
+                                bitrate += ' kbits/s';
+                                bitrateDiv.innerHTML = `<strong>${bitrate}</strong>`;
+                                }
+                            });
+                        },
+                        function(err){
+                            console.log(err)
+                        }
+                    );
                 }
                 function updateMessage(state){
                     
                     switch(state){
                         case 'init':
-                            self.message = '等待对方加入...';
+                            self.message = '等待对方进入...';
                             break;
                         case 'standby':
                             self.message = '对方已就绪, 请发起呼叫';
