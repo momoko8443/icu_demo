@@ -3,7 +3,24 @@
     {
       "id": "c1",
       "name": "北部 01",
-      "peers": []
+      "peers": [
+        {
+          "id": "uzGGTAwR6",
+          "alias": "B01-mac",
+          "channel": {
+            "id": "c1",
+            "name": "北部 01"
+          }
+        },
+        {
+          "id": "pazP8ng4f",
+          "alias": "b01-pro2",
+          "channel": {
+            "id": "c1",
+            "name": "北部 01"
+          }
+        }
+      ]
     },
     {
       "id": "c2",
@@ -62,7 +79,16 @@
     {
       "id": "c5",
       "name": "北部 05",
-      "peers": []
+      "peers": [
+        {
+          "id": "xZ5_aVn-0",
+          "alias": "B05-FF",
+          "channel": {
+            "id": "c5",
+            "name": "北部 05"
+          }
+        }
+      ]
     },
     {
       "id": "c6",

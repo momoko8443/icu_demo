@@ -115,3 +115,14 @@ video{
     bottom: 5px;
     left: 20px;
 }
+
+.logConsole {
+    border: 1px solid gray;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    overflow: auto;
+    overflow-x: hidden;
+}
