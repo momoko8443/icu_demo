@@ -1,5 +1,6 @@
-<html lang="en">
+<!DOCTYPE html>
 
+<html lang="en">
 <head>
     <!-- <link rel="manifest" href="/manifest.json"> -->
     <meta charset="UTF-8">
@@ -10,8 +11,8 @@
     <meta http-equiv="pragma" content="no-cache">
     <title>ICU RTC</title>
     <link rel="icon" sizes="192x192" href="demos/images/icu/icon.png">
-    <link rel="shortcut icon" href="demos/favicon/favicon.ico">
-    <link rel="icon" type="image/gif" href="demos/favicon/animated_favicon1.gif">
+    <link rel="shortcut icon" href="demos/favicon/favicon.ico" >
+    <link rel="icon" type="image/gif" href="demos/favicon/animated_favicon1.gif" >
     <link rel="stylesheet" href="demos/css/purecss/pure-min.css">
     <link rel="stylesheet" href="demos/css/purecss/grids-responsive-min.css">
     <link rel="stylesheet" href="demos/css/animate/animate.css">
@@ -26,18 +27,23 @@
     <script src="/easyrtc/easyrtc.js"></script>
     <script src="/easyrtc/labs/easyrtc_rates.js"></script>
 </head>
-
 <body uku-application style="height: 100%;background-color: darkslategrey;visibility: hidden">
-    <welcome id="welcome" uku-render="appCtrl.currentStage === 'welcome'" uku-onentersettings="appCtrl.enterSettingHandler()"
+    <welcome id="welcome" uku-render="appCtrl.currentStage === 'welcome'" 
+        uku-onentersettings="appCtrl.enterSettingHandler()"
         uku-onenterevent="appCtrl.enterEventHandler()"></welcome>
-    <login id="login" uku-render="appCtrl.currentStage === 'login'" uku-onloginsuccessevent="appCtrl.loginSuccessEventHandler()"
+    <login id="login" uku-render="appCtrl.currentStage === 'login'" 
+        uku-onloginsuccessevent="appCtrl.loginSuccessEventHandler()"
         uku-oncancellogin="appCtrl.cancelLoginHandler()"></login>
     <exit-channel id="exitChannel" uku-peer="appCtrl.peer" uku-render="appCtrl.currentStage === 'exitChannel'"
-        uku-onsettingsdeleted="appCtrl.settingsDeletedHandler()" uku-oncancelexitchannel="appCtrl.cancelExitChannelHandler()"></exit-channel>
-    <choose-channel id="chooseChannel" uku-render="appCtrl.currentStage === 'chooseChannel'" uku-onsettingssaved="appCtrl.settingsSavedHandler()"
+        uku-onsettingsdeleted="appCtrl.settingsDeletedHandler()"
+        uku-oncancelexitchannel="appCtrl.cancelExitChannelHandler()"></exit-channel>
+    <choose-channel id="chooseChannel" uku-render="appCtrl.currentStage === 'chooseChannel'"
+        uku-onsettingssaved="appCtrl.settingsSavedHandler()"
         uku-oncancelchoosechannel="appCtrl.cancelChooseChannelHandler()"></choose-channel>
-    <video-chat id="videoChat" uku-render="appCtrl.currentStage === 'videoChat'" uku-oncancelcalling="appCtrl.cancelcallingHandler()"
-        uku-onexitvideochat="appCtrl.exitVideoChatHandler()" uku-onhangupcall="appCtrl.hangUpCallHandler()"></video-chat>
+    <video-chat id="videoChat" uku-render="appCtrl.currentStage === 'videoChat'"
+        uku-oncancelcalling="appCtrl.cancelcallingHandler()"
+        uku-onexitvideochat="appCtrl.exitVideoChatHandler()"
+        uku-onhangupcall="appCtrl.hangUpCallHandler()"></video-chat>
     <audio id="ring" volume="0.5" src="demos/mp3/weixin_call.mp3" loop></audio>
     <audio id="warning" volume="1" src="demos/mp3/warning-audio.mp3"></audio>
     <!-- <div id="debug">
@@ -48,11 +54,11 @@
 <script>
     var uku = new Ukulele();
     var appCtrl = new ApplicationController(uku);
-    uku.registerComponent('welcome', 'demos/components/welcome.html');
-    uku.registerComponent('login', 'demos/components/login.html');
-    uku.registerComponent('choose-channel', 'demos/components/chooseChannel.html');
-    uku.registerComponent('exit-channel', 'demos/components/exitChannel.html');
-    uku.registerComponent('video-chat', 'demos/components/videoChat.html');
+    uku.registerComponent('welcome','demos/components/welcome.html');
+    uku.registerComponent('login','demos/components/login.html');
+    uku.registerComponent('choose-channel','demos/components/chooseChannel.html');
+    uku.registerComponent('exit-channel','demos/components/exitChannel.html');
+    uku.registerComponent('video-chat','demos/components/videoChat.html');
     uku.registerController('appCtrl', appCtrl);
     uku.init();
     uku.addListener(Ukulele.INITIALIZED, function () {
@@ -71,173 +77,142 @@
         var exitChannelPage;
         var videoChatPage;
 
-        this.socketConnect = function () {
-            socket = io.connect(location.href, {
-                reconnection: true,
-                pingInterval: 15000,
-                pingTimeout: 5000,
-                reconnectionDelay: 1000,
-                reconnectionDelayMax: 5000,
-                reconnectionAttempts: Infinity
-            });
-            socket.on('disconnect', function (data) {
-                //var videoChatInstance = uku.getComponentController('videoChat');
-                //videoChatInstance.wifiDisconnect();
-                // setTimeout( function(){
-                //     self.socketConnect();
-                // }, 5000 );
-            });
-            socket.on('client_connected', function (data) {
-                console.log(data);
-                socket.emit('join_room', {
-                    room: self.peer.channel.id
-                });
-            });
-
-            socket.on('peer_exit', function (data) {
-                if (data.self !== self.peer.id && self.currentStage === 'videoChat') {
-                    var videoChatInstance = uku.getComponentController('videoChat');
-                    videoChatInstance.peerExit();
-                }
-            });
-            socket.on('cancel_calling', function (data) {
-                if (data.self !== self.peer.id && self.currentStage === 'videoChat') {
-                    var videoChatInstance = uku.getComponentController('videoChat');
-                    videoChatInstance.reject();
-                }
-            });
-            socket.on('refreshAllClient', function (data) {
-                console.log(data);
-                location.reload();
-            });
-            socket.on('hangup_call', function (data) {
-                if (data.self !== self.peer.id && self.currentStage === 'videoChat') {
-                    var videoChatInstance = uku.getComponentController('videoChat');
-                    videoChatInstance.beHangUp();
-                }
-            });
-        }
-
-        this.init = function () {
+        this.init = function(){
             welcomePage = document.getElementById('welcome');
             loginPage = document.getElementById('login');
             chooseChannelPage = document.getElementById('chooseChannel');
             exitChannelPage = document.getElementById('exitChannel');
             videoChatPage = document.getElementById('videoChat');
-
-            if (localStorage.getItem('peer')) {
+            
+            if(localStorage.getItem('peer')){
                 isRegister = true;
-                try {
+                try{
                     this.peer = JSON.parse(localStorage.getItem('peer'));
-                    if (!this.peer) {
+                    if(!this.peer){
                         alert('未能读取节点配置信息');
                         return;
                     }
-                } catch (e) {
+                }catch(e){
                     alert(JSON.stringify(e));
                     return;
                 }
-                this.socketConnect();
+                
+                socket = io(location.href);
+                socket.on('client_connected', function (data) {
+                    console.log(data);
+                    socket.emit('join_room', { room: self.peer.channel.id });
+                });
+
+                socket.on('peer_exit',function(data){
+                    if(data.self !== self.peer.id && self.currentStage === 'videoChat'){
+                        var videoChatInstance = uku.getComponentController('videoChat');
+                        videoChatInstance.peerExit();
+                    }  
+                });
+                socket.on('cancel_calling',function(data){
+                    if(data.self !== self.peer.id && self.currentStage === 'videoChat'){
+                        var videoChatInstance = uku.getComponentController('videoChat');
+                        videoChatInstance.reject();
+                    }
+                });
+                socket.on('refreshAllClient',function(data){
+                    console.log(data);
+                    location.reload();
+                });
+                socket.on('hangup_call', function(data){
+                    if(data.self !== self.peer.id && self.currentStage === 'videoChat'){
+                        var videoChatInstance = uku.getComponentController('videoChat');
+                        videoChatInstance.beHangUp();
+                    } 
+                });
             }
 
-            this.enterSettingHandler = function () {
-                switchView(welcomePage, loginPage);
+            this.enterSettingHandler = function(){
+                switchView(welcomePage,loginPage);
             };
-            this.enterEventHandler = function (e, callback) {
-                if (isRegister) {
-                    if (socket) {
-                        switchView(e.currentTarget, videoChatPage, function () {
+            this.enterEventHandler = function(e, callback){
+                if(isRegister){
+                    if(socket){
+                        switchView(e.currentTarget,videoChatPage,function(){
                             var videoChatInstance = uku.getComponentController('videoChat');
                             videoChatInstance.init(self.peer, vidoeChatCfg);
                             callback && callback();
                         })
                     }
-                } else {
-                    switchView(e.currentTarget, loginPage, function () {
+                }else{
+                    switchView(e.currentTarget, loginPage, function(){
                         callback && callback();
                     });
                 }
             }
 
-            this.loginSuccessEventHandler = function (e) {
-                if (isRegister) {
-                    switchView(e.currentTarget, exitChannelPage);
-                } else {
-                    switchView(e.currentTarget, chooseChannelPage, function () {
+            this.loginSuccessEventHandler = function(e){
+                if(isRegister){
+                    switchView(e.currentTarget,exitChannelPage);
+                }else{
+                    switchView(e.currentTarget,chooseChannelPage,function(){
                         var chooseChannelInstance = uku.getComponentController('chooseChannel');
                         chooseChannelInstance.init();
                     });
                 }
             };
-            this.cancelLoginHandler = function (e) {
-                switchView(e.currentTarget, welcomePage);
+            this.cancelLoginHandler = function(e){
+                switchView(e.currentTarget,welcomePage);
             };
 
-            this.settingsSavedHandler = function () {
+            this.settingsSavedHandler = function(){
                 location.reload();
             };
-            this.settingsDeletedHandler = function () {
+            this.settingsDeletedHandler = function(){
                 location.reload();
             };
 
-            this.cancelChooseChannelHandler = function (e) {
-                switchView(e.currentTarget, welcomePage);
+            this.cancelChooseChannelHandler = function(e){
+                switchView(e.currentTarget,welcomePage);
             };
-            this.cancelExitChannelHandler = function (e) {
-                switchView(e.currentTarget, welcomePage);
+            this.cancelExitChannelHandler = function(e){
+                switchView(e.currentTarget,welcomePage);
             };
-            this.exitVideoChatHandler = function (e) {
-                switchView(e.currentTarget, welcomePage, function () {
-                    socket.emit('peer_exit', {
-                        self: self.peer.id,
-                        room: self.peer.channel.id
-                    });
+            this.exitVideoChatHandler = function(e){
+                switchView(e.currentTarget,welcomePage,function(){
+                    socket.emit('peer_exit',{ self:self.peer.id,room: self.peer.channel.id });                 
                 });
             };
-            this.cancelcallingHandler = function (e) {
-                socket.emit('cancel_calling', {
-                    self: self.peer.id,
-                    room: self.peer.channel.id
-                });
+            this.cancelcallingHandler = function(e){
+                socket.emit('cancel_calling',{ self:self.peer.id,room: self.peer.channel.id });
             };
-            this.hangUpCallHandler = function () {
-                socket.emit('hangup_call', {
-                    self: self.peer.id,
-                    room: self.peer.channel.id
-                });
+            this.hangUpCallHandler = function(){
+                socket.emit('hangup_call',{ self:self.peer.id,room: self.peer.channel.id });
             }
             var vidoeChatCfg;
-            getCfg().then(function (result) {
+            getCfg().then(function(result){
                 //console.log(result);
                 vidoeChatCfg = result;
-                self.enterEventHandler({
-                    currentTarget: welcomePage
-                }, function () {
-                    $('body').css('visibility', 'visible');
+                self.enterEventHandler({currentTarget:welcomePage}, function(){
+                    $('body').css('visibility','visible');
                 });
-
+                
             });
 
-            function switchView(oldView, newView, callback) {
-                $(oldView).animateCss('fadeOut', function () {
+            function switchView(oldView,newView,callback){
+                $(oldView).animateCss('fadeOut', function(){
                     self.currentStage = newView.id;
                     uku.refresh();
                     $(newView).animateCss('fadeIn');
-                    if (callback && typeof callback === 'function') {
+                    if(callback && typeof callback === 'function'){
                         callback();
                     }
                 })
             }
 
-            function getCfg() {
-                return axios.get('/config').then(function (result) {
+            function getCfg(){
+                return axios.get('/config').then(function(result){
                     return result.data;
-                }).catch(function (err) {
+                }).catch(function(err){
                     alert(err);
                 });
             }
         }
     }
 </script>
-
 </html>

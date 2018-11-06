@@ -1,13 +1,7 @@
 var socketIo = require("socket.io"); 
 
 module.exports = function(webServer){
-    var socketServer = socketIo.listen(webServer, 
-        {
-            "log level":1,
-            //pingInterval: 10000,
-            //pingTimeout: 5000
-        }
-    );
+    var socketServer = socketIo.listen(webServer, {"log level":1});
     var roomMap = {};
     socketServer.on('connection', function (socket) {
         socket.emit('client_connected', { message: 'client connected successfully' });
@@ -15,13 +9,11 @@ module.exports = function(webServer){
             var roomName = roomMap[socket.id];
             var data = {room:roomName};
             socketServer.to(roomName).emit('peer_exit',data);
-            console.log('----------------------', socket.id + ' disconnected');
         });
         socket.on('join_room', function (data) {
             var roomName = data.room;
             roomMap[socket.id] = data.room;
             socket.join(data.room);
-            console.log('----------------------', socket.id + ' joined room ' + data.room);
         });
         socket.on('dial',function(data){
             var room = data.room;

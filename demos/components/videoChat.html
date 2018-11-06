@@ -83,7 +83,7 @@
                 let timestampPrev;
                 let bytesPrev;
                 let devicePixleRatio = 2;
-                let isActiveExit = false;
+		let isActiveExit = false;
                 this.hideLogHandler = function(){
                     this.showLog = false;
                 };
@@ -116,7 +116,7 @@
                         function successCB(roomName){
                             log('Leave room: '+ roomName + ' success.');
                             isActiveExit = true;
-                            easyrtc.disconnect();
+			    easyrtc.disconnect();
                         }, 
                         function failCB(errorCode, errorText, roomName){
                             log('Leave room: '+ roomName + 'failed. ' +errorCode + ' ' + errorText);
@@ -127,7 +127,7 @@
                     
                 };
 
-                this.peerExit = function(){              
+                this.peerExit = function(){
                     this.currentState = 'init';
                     uku.refresh();
                 };
@@ -146,14 +146,12 @@
                     easyrtc.setVideoDims(videoW,videoH);
                     easyrtc.setUsername(peer.alias);
                     easyrtc.setRoomOccupantListener(roomOccupantHandler);
-                    //easyrtc.setSocketUrl(location.href, {'connect timeout': 15000,'force new connection': true});
                     easyrtc.setDisconnectListener(function () {
                         if(isActiveExit){
-                            easyrtc.closeLocalMediaStream();
+			    easyrtc.closeLocalMediaStream();
                             log('setDisconnectListener: disconnect success');
-                            self.fire('exitvideochat'); 
-                        }
-                        
+                            self.fire('exitvideochat');
+			} 
                     });
                     var localFilter = easyrtc.buildLocalSdpFilter( {
                         // audioRecvCodec:"G.711",
@@ -172,11 +170,7 @@
                     easyrtc.setSdpFilters(localFilter, remoteFilter);
                     easyrtc.easyApp("easyrtc.audioVideoSimple", "selfVideo", ["callerVideo"],loginSuccess,loginFailure);
                         
-                    easyrtc.setOnStreamClosed( function(easyrtcid, stream, streamName){
-                        easyrtc.setVideoObjectSrc( document.getElementById("callerVideo"), "");
-                        //( easyrtc.idToName(easyrtcid) + " closed stream " + stream.id + " " + streamName);
-                        
-                    });
+                    
 
                     easyrtc.setAcceptChecker(function (easyrtcid, acceptor) {
                         //console.log('acceptor ', easyrtcid);
@@ -242,13 +236,6 @@
                     this.currentState = 'standby';
                     log('this.beHangUp -> standby');
                     uku.refresh();
-                };
-
-                this.wifiDisconnect = function() {
-                    if(this.currentState === 'inMeeting'){
-                        alert('WIFI已断开, 请检查你的网络');
-                        //this.currentState = 'init';
-                    }
                 };
                 
                 var timerEditMode;
@@ -389,7 +376,7 @@
 
                 function resetFlags(cfg) {
                     isActiveExit = false;
-                    timestampPrev = 0;
+		    timestampPrev = 0;
                     bytesPrev = 0;
                     touchedCount = 0;
                     autoExitTimeLeft = cfg.autoExitSecond;
@@ -404,9 +391,8 @@
                     if (timerCountdown) {
                         clearInterval(timerCountdown);
                     }
-                    jq('#bitrateDiv').html('');    
-                    easyrtc.clearMediaStream( document.getElementById('callerVideo'));
-                    
+                    jq('#bitrateDiv').html('');
+		    easyrtc.clearMediaStream( document.getElementById('callerVideo'));
                 }
 
                 function resetFlagsStandby(cfg) {
@@ -418,7 +404,7 @@
                         clearInterval(timerCountdown);
                     }
                     jq('#bitrateDiv').html('');
-                    easyrtc.clearMediaStream( document.getElementById('callerVideo'));
+		    easyrtc.clearMediaStream( document.getElementById('callerVideo'));
                 }
                 
                 function countdown() {
@@ -433,39 +419,33 @@
                         self.hangUp();
                         uku.refresh();
                     }
+                    //var peer = easyrtc.getPeerConnectionByUserId(callerId);
+                    easyrtc.getPeerConnectionByUserId(callerId).getStats(null)
+                    .then(
+                        function(results){
+                            results.forEach(report => {
+                                const now = report.timestamp;
 
-                    var peer = easyrtc.getPeerConnectionByUserId(callerId);
-                    if(peer){
-                        peer.getStats(null).then(
-                            function(results){
-                                results.forEach(report => {
-                                    const now = report.timestamp;
-
-                                    let bitrate;
-                                    if (report.type === 'inbound-rtp' && report.mediaType === 'video') {
-                                    const bytes = report.bytesReceived;
-                                    // if(bytes === bytesPrev){
-                                    //     alert('对方由于网络原因断开, 请稍后重试...');
-                                    //     self.currentState = 'init';
-                                    // }
-                                    if (timestampPrev) {
-                                        bitrate = 8 * (bytes - bytesPrev) / (now - timestampPrev);
-                                        bitrate = Math.floor(bitrate);
-                                    }
-                                    bytesPrev = bytes;
-                                    timestampPrev = now;
-                                    }
-                                    if (bitrate) {
-                                    bitrate += ' kbits/s';
-                                    bitrateDiv.innerHTML = `<strong>${bitrate}</strong>`;
-                                    }
-                                });
-                            },
-                            function(err){
-                                console.log(err)
-                            }
-                        );
-                    }
+                                let bitrate;
+                                if (report.type === 'inbound-rtp' && report.mediaType === 'video') {
+                                const bytes = report.bytesReceived;
+                                if (timestampPrev) {
+                                    bitrate = 8 * (bytes - bytesPrev) / (now - timestampPrev);
+                                    bitrate = Math.floor(bitrate);
+                                }
+                                bytesPrev = bytes;
+                                timestampPrev = now;
+                                }
+                                if (bitrate) {
+                                bitrate += ' kbits/s';
+                                bitrateDiv.innerHTML = `<strong>${bitrate}</strong>`;
+                                }
+                            });
+                        },
+                        function(err){
+                            console.log(err)
+                        }
+                    );
                 }
                 function updateMessage(state){
                     
