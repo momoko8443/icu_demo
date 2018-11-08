@@ -18,14 +18,17 @@
     <link rel="stylesheet" href="demos/css/animate/animate.css">
     <link rel="stylesheet" href="demos/css/main.css">
     <link rel="stylesheet" href="demos/css/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="demos/css/bootstrap/css/bootstrap.min.css">
     <script src="demos/js/socket.io/socket.io.min.js"></script>
     <!-- <script src="demos/js/uku-routejs/build/js/uku-route.js"></script> -->
     <script src="demos/js/ukulele/uku.js"></script>
     <script src="demos/js/jquery/jquery-3.3.1.min.js"></script>
     <script src="demos/js/jq.animate.plugin.js"></script>
     <script src="demos/js/axios/axios.min.js"></script>
+    <script src="demos/css/bootstrap/js/bootstrap.min.js"></script>
     <script src="/easyrtc/easyrtc.js"></script>
     <script src="/easyrtc/labs/easyrtc_rates.js"></script>
+
 </head>
 <body uku-application style="height: 100%;background-color: darkslategrey;visibility: hidden">
     <welcome id="welcome" uku-render="appCtrl.currentStage === 'welcome'" 
@@ -44,8 +47,8 @@
         uku-oncancelcalling="appCtrl.cancelcallingHandler()"
         uku-onexitvideochat="appCtrl.exitVideoChatHandler()"
         uku-onhangupcall="appCtrl.hangUpCallHandler()"></video-chat>
-    <audio id="ring" volume="0.5" src="demos/mp3/weixin_call.mp3" loop></audio>
-    <audio id="warning" volume="1" src="demos/mp3/warning-audio.mp3"></audio>
+    <audio id="ring" volume="0.9" src="demos/mp3/weixin_call.mp3" loop></audio>
+    <audio id="warning" volume="0.9" src="demos/mp3/warning-audio.mp3"></audio>
     <!-- <div id="debug">
         
     </div> -->

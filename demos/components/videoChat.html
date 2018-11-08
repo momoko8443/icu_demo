@@ -19,7 +19,7 @@
                 </div>
                 <div class="logConsole" uku-render="cc.showLog">
                     <button uku-onclick="cc.hideLogHandler()">X</button>
-                    <pre style="color:white">{{cc.logs}}</pre>
+                    <pre style="color:red">{{cc.logs}}</pre>
                 </div>
                 <div class="console">
                     <div class="buttonBox">
@@ -57,6 +57,23 @@
                     </div>
                 </div>
             </div>
+                        <!-- Modal -->
+            <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <!-- <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">视频探视</h4>
+                    </div> -->
+                    <div class="modal-body">
+                        {{cc.modalMessage}}
+                    </div>
+                    <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">确定</button>
+                    </div>
+                </div>
+                </div>
+            </div>
         </div>
     </template>
     <script>
@@ -71,6 +88,7 @@
                 this.peer = null;
                 this.showLog = false;
                 this.logs = "";
+                this.modalMessage = "";
 
                 var room;
                 var autoExitTimeLeft;
@@ -138,7 +156,6 @@
                 this.init = function (peer, cfg) {
                     //alert('w '+$('body').width());
                     //alert('h '+$('body').height());
-                    
                     selfVideoDom = document.getElementById('selfVideo');
                     var videoW = $('body').width() * devicePixleRatio;
                     var videoH = $('body').height() * devicePixleRatio;
@@ -231,6 +248,7 @@
 
                 this.hangUp = function () {
                     easyrtc.hangup(callerId);
+                    window.localStorage.removeItem("time_left");
                     this.currentState = 'standby';
                     this.fire('hangupcall');
                     log('this.hangUp -> standby');
@@ -238,6 +256,7 @@
                 };
 
                 this.beHangUp = function () {
+                    window.localStorage.removeItem("time_left");
                     this.currentState = 'standby';
                     log('this.beHangUp -> standby');
                     uku.refresh();
@@ -330,10 +349,15 @@
                             return;
                         }
                         callerId = keys[0];
-                        self.currentState = 'standby';
-                        self.otherClientName = easyrtc.idToName(callerId);
-                        log('roomOccupantHandler -> standby');
-                        uku.refresh();
+                        log(JSON.stringify(keys));
+                        if(self.currentState === 'inMeeting'){
+                            peerDisconnectHandler(disconnectSide, true);
+                        }else{
+                            self.currentState = 'standby';
+                            self.otherClientName = easyrtc.idToName(callerId);
+                            log('roomOccupantHandler -> standby');
+                            uku.refresh();
+                        }         
                     }
                 }
 
@@ -349,7 +373,6 @@
                         console.log('performCall Failed');
                         console.error(errorCode, errMessage);
                         log('performCall Failed');
-                        //peerDisconnectHandler();
                     };
                     var wasAcceptedCB = function (wasAccepted, easyrtcid) {
                         if (wasAccepted) {
@@ -384,6 +407,7 @@
                 function resetFlags(cfg) {
                     pervBitrateString = "";
                     peerDisconnectCount = 0;
+                    disconnectSide = true;
                     isActiveExit = false;
                     timestampPrev = 0;
                     bytesPrev = 0;
@@ -418,6 +442,7 @@
                     self.timeDisplay = "";
                     pervBitrateString = "";
                     peerDisconnectCount = 0;
+                    disconnectSide = true;
                     jq('#timeleft').removeClass('six_zero_sec_left');
                     if (timerCountdown) {
                         clearInterval(timerCountdown);
@@ -427,6 +452,7 @@
                 }
                 let pervBitrateString;
                 let peerDisconnectCount = 0;
+                let disconnectSide = true;
                 function countdown() {
                     self.time -= 1000;
                     self.timeDisplayFunc();
@@ -440,25 +466,18 @@
                         self.hangUp();
                         uku.refresh();
                     }
-
-                    if(pervBitrateString === bitrateDiv.innerHTML){
-                        peerDisconnectCount++;
-                    }else{
-                        peerDisconnectCount = 0;
-                        pervBitrateString = bitrateDiv.innerHTML;
-                    }
-                    if(peerDisconnectCount === 15){
-                        let obj = {'left':self.time + 15000,'time':new Date().getTime()};
-                        localStorage.setItem('time_left', JSON.stringify(obj));
-                        peerDisconnectHandler();
-                    }
                     
-                    easyrtc.getPeerConnectionByUserId(callerId).getStats(null)
+                    let peer = easyrtc.getPeerConnectionByUserId(callerId);
+                    if(peer){   
+                        //log(peer.iceConnectionState);
+                        if(peer.iceConnectionState === 'disconnected'){
+                            disconnectSide = false;
+                        }
+                        peer.getStats(null)
                         .then(
                             function (results) {
                                 results.forEach(report => {
                                     const now = report.timestamp;
-
                                     let bitrate;
                                     if (report.type === 'inbound-rtp' && report.mediaType === 'video') {
                                         const bytes = report.bytesReceived;
@@ -474,7 +493,6 @@
                                         bitrate += ' kbits/s';
                                         bitrateDiv.innerHTML = `<strong>${bitrate}</strong>`;
                                     }
-                                    
                                 });
                             },
                             function (err) {
@@ -482,6 +500,16 @@
                                 console.log(err)
                             }
                         );
+                    }
+                    if(pervBitrateString === bitrateDiv.innerHTML){
+                        peerDisconnectCount++;
+                    }else{
+                        peerDisconnectCount = 0;
+                        pervBitrateString = bitrateDiv.innerHTML;
+                    }  
+                    if(peerDisconnectCount === 15){
+                        peerDisconnectHandler(disconnectSide, true);
+                    }
                 }
 
                 function updateMessage(state) {
@@ -517,9 +545,24 @@
                     uku.refresh();
                 }
 
-                function peerDisconnectHandler(){
-                    alert('由于网络问题, 探视中断, 请稍后再拨');
-                    window.location.reload();
+                function peerDisconnectHandler(disconnectSide, isRefresh){
+                    let left = self.time + 15000 > config.callLimitSecond * 1000 ?  config.callLimitSecond * 1000 : self.time + 15000;
+                    let obj = {'left':left,'time':new Date().getTime()};
+                    localStorage.setItem('time_left', JSON.stringify(obj));
+                    if(disconnectSide){
+                        alertModal('探视中断, 请检查您的网络后重新呼叫',function(){
+                            if(isRefresh){
+                                window.location.reload();
+                            }  
+                        });
+                    }else{
+                        alertModal('对方断开连接, 请等待对方重新就绪后, 再次呼叫', function(){
+                            if(isRefresh){
+                                window.location.reload();
+                            }  
+                        });
+                    }
+                     
                 }
 
                 function getMeetingLeftTime(config){
@@ -534,6 +577,15 @@
                     }else{
                         return config.callLimitSecond * 1000;
                     }
+                }
+
+                function alertModal(message,handler){
+                    self.modalMessage = message;
+                    uku.refresh();
+                    $('#myModal').modal();
+                    $('#myModal').on('hidden.bs.modal', function (e) {
+                        handler && handler();
+                    })
                 }
             }
         })($)
