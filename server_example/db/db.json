@@ -5,16 +5,16 @@
       "name": "北部 01",
       "peers": [
         {
-          "id": "uzGGTAwR6",
-          "alias": "B01-mac",
+          "id": "sgV9XjPZR",
+          "alias": "北部_3F_探视端",
           "channel": {
             "id": "c1",
             "name": "北部 01"
           }
         },
         {
-          "id": "pazP8ng4f",
-          "alias": "b01-pro2",
+          "id": "munNKV7tP",
+          "alias": "北部_3F_病房端",
           "channel": {
             "id": "c1",
             "name": "北部 01"
