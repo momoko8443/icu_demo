@@ -1,45 +1,58 @@
 const low = require('lowdb')
+const _ = require('lodash')
 const FileSync = require('lowdb/adapters/FileSync')
 const adapter = new FileSync('./db/db.json')
 
 const db = low(adapter)
 
 // Set some defaults (required if your JSON file is empty)
-var channels = [{
-        id: 'c1',
-        name: 'Channel 1',
-        peers: []
+//const beds = ["1床","2床","3床","4床","5床","6床","7床","8床","9床","10床","11床","12床","13床","14床","15床","16床","17床","18床","19床","20床","21床"];
+const clients = [
+    {
+        name: "1号病区",
+        type: "callee",
+        range: ["1床","2床","3床","4床","5床","6床","7床"],
+        clientId: "",
+        isCompleted: false
     },
     {
-        id: 'c2',
-        name: 'Channel 2',
-        peers: []
+        name: "2号病区",
+        type: "callee",
+        range: ["8床","9床","10床","11床","12床","13床","14床"],
+        clientId: "",
+        isCompleted: false
     },
     {
-        id: 'c3',
-        name: 'Channel 3',
-        peers: []
+        name: "3号病区",
+        type: "callee",
+        range: ["15床","16床","17床","18床","19床","20床","21床"],
+        clientId: "",
+        isCompleted: false
     },
     {
-        id: 'c4',
-        name: 'Channel 4',
-        peers: []
+        name: "护士站",
+        type: "caller",
+        range: ["护士站"],
+        clientId: "",
+        isCompleted: false
     },
     {
-        id: 'c5',
-        name: 'Channel 5',
-        peers: []
-    }
-];
+        name: "探视端",
+        type: "caller",
+        range: ["探视端"],
+        clientId: "",
+        isCompleted: false
+    },
+]
 db.defaults({
-        channels: channels
+    clients: clients
     })
     .write();
 
 db.defaults({
         users: [{
             username: 'admin',
-            password: '161ebd7d45089b3446ee4e0d86dbcf92'
+            password: 'admin'
         }]
     })
     .write();
@@ -48,44 +61,25 @@ function IcuDB() {
     this.getUser = function(username){
         return db.get('users').find({username: username}).value();
     };
-
-    this.getChannels = function () {
-        return db.get('channels').value();
+    this.getClients = function(){
+        return db.get('clients').filter({isCompleted: false}).value();
     };
 
-    this.getChannel = function (channelId) {
-        return db.get('channels').find({
-            id: channelId
+    this.getClient = function(alias){
+        return db.get('clients').filter((o)=>{
+            return _.includes(o.range,alias);
         }).value();
+    };
+
+    this.setClient = function(alias, clientId){
+        return db.get('clients').filter((o)=>{
+            return _.includes(o.range,alias);
+        }).head().assign({ 'clientId': clientId, 'isCompleted': true }).write();
+    };
+
+    this.removeClient = function(clientId){
+        return db.get('clients').find({'clientId': clientId}).assign({ 'clientId': '', 'isCompleted': false }).write();
     }
-
-    this.getPeers = function (channelId) {
-        return db.get('channels').find({
-            id: channelId
-        }).get('peers').value();
-    };
-
-    this.getPeer = function (channelId, peerId) {
-        return db.get('channels').find({
-            id: channelId
-        }).get('peers').find({
-            id: peerId
-        }).value();
-    }
-
-    this.addPeer = function (channelId, peer) {
-        db.get('channels').find({
-            id: channelId
-        }).get('peers').push(peer).write();
-    };
-
-    this.removePeer = function (channelId, peerId) {
-        db.get('channels').find({
-            id: channelId
-        }).get('peers').remove({
-            id: peerId
-        }).write();
-    };
 }
 
 module.exports = new IcuDB();

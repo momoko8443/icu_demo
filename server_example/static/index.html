@@ -40,9 +40,9 @@
     <exit-channel id="exitChannel" uku-peer="appCtrl.peer" uku-render="appCtrl.currentStage === 'exitChannel'"
         uku-onsettingsdeleted="appCtrl.settingsDeletedHandler()"
         uku-oncancelexitchannel="appCtrl.cancelExitChannelHandler()"></exit-channel>
-    <choose-channel id="chooseChannel" uku-render="appCtrl.currentStage === 'chooseChannel'"
+    <choose-client id="chooseClient" uku-render="appCtrl.currentStage === 'chooseClient'"
         uku-onsettingssaved="appCtrl.settingsSavedHandler()"
-        uku-oncancelchoosechannel="appCtrl.cancelChooseChannelHandler()"></choose-channel>
+        uku-oncancelchooseclient="appCtrl.cancelChooseClientHandler()"></choose-client>
     <video-chat id="videoChat" uku-render="appCtrl.currentStage === 'videoChat'"
         uku-oncancelcalling="appCtrl.cancelcallingHandler()"
         uku-onexitvideochat="appCtrl.exitVideoChatHandler()"
@@ -59,7 +59,7 @@
     var appCtrl = new ApplicationController(uku);
     uku.registerComponent('welcome','demos/components/welcome.html');
     uku.registerComponent('login','demos/components/login.html');
-    uku.registerComponent('choose-channel','demos/components/chooseChannel.html');
+    uku.registerComponent('choose-client','demos/components/chooseClient.html');
     uku.registerComponent('exit-channel','demos/components/exitChannel.html');
     uku.registerComponent('video-chat','demos/components/videoChat.html');
     uku.registerController('appCtrl', appCtrl);
@@ -76,22 +76,22 @@
         var socket;
         var welcomePage;
         var loginPage;
-        var chooseChannelPage;
+        var chooseClientPage;
         var exitChannelPage;
         var videoChatPage;
 
         this.init = function(){
             welcomePage = document.getElementById('welcome');
             loginPage = document.getElementById('login');
-            chooseChannelPage = document.getElementById('chooseChannel');
+            chooseClientPage = document.getElementById('chooseClient');
             exitChannelPage = document.getElementById('exitChannel');
             videoChatPage = document.getElementById('videoChat');
             
-            if(localStorage.getItem('peer')){
+            if(localStorage.getItem('client')){
                 isRegister = true;
                 try{
-                    this.peer = JSON.parse(localStorage.getItem('peer'));
-                    if(!this.peer){
+                    this.client = JSON.parse(localStorage.getItem('client'));
+                    if(!this.client){
                         alert('未能读取节点配置信息');
                         return;
                     }
@@ -153,9 +153,9 @@
                 if(isRegister){
                     switchView(e.currentTarget,exitChannelPage);
                 }else{
-                    switchView(e.currentTarget,chooseChannelPage,function(){
-                        var chooseChannelInstance = uku.getComponentController('chooseChannel');
-                        chooseChannelInstance.init();
+                    switchView(e.currentTarget,chooseClientPage,function(){
+                        var chooseClientInstance = uku.getComponentController('chooseClient');
+                        chooseClientInstance.init();
                     });
                 }
             };
@@ -170,7 +170,7 @@
                 location.reload();
             };
 
-            this.cancelChooseChannelHandler = function(e){
+            this.cancelChooseClientHandler = function(e){
                 switchView(e.currentTarget,welcomePage);
             };
             this.cancelExitChannelHandler = function(e){

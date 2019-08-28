@@ -1,231 +1,73 @@
 {
-  "channels": [
+  "clients": [
     {
-      "id": "c1",
-      "name": "北部 01",
-      "peers": [
-        {
-          "id": "munNKV7tP",
-          "alias": "北部_3F_病房端",
-          "channel": {
-            "id": "c1",
-            "name": "北部 01"
-          }
-        }
-      ]
+      "name": "1号病区",
+      "type": "callee",
+      "range": [
+        "1床",
+        "2床",
+        "3床",
+        "4床",
+        "5床",
+        "6床",
+        "7床"
+      ],
+      "clientId": "",
+      "isCompleted": false
     },
     {
-      "id": "c2",
-      "name": "北部 02",
-      "peers": [
-        {
-          "id": "a-HQhUT3b",
-          "alias": "B02-mac",
-          "channel": {
-            "id": "c2",
-            "name": "北部 02"
-          }
-        },
-        {
-          "id": "1WRheDUax",
-          "alias": "B2-ff"
-        }
-      ]
+      "name": "2号病区",
+      "type": "callee",
+      "range": [
+        "8床",
+        "9床",
+        "10床",
+        "11床",
+        "12床",
+        "13床",
+        "14床"
+      ],
+      "clientId": "XmkqZckId",
+      "isCompleted": true
     },
     {
-      "id": "c3",
-      "name": "北部 03",
-      "peers": [
-        {
-          "id": "9ICJxfePD",
-          "alias": "b3-1",
-          "channel": {
-            "id": "c3",
-            "name": "北部 03"
-          }
-        },
-        {
-          "id": "aAMJVW8i-",
-          "alias": "b3-2"
-        }
-      ]
+      "name": "3号病区",
+      "type": "callee",
+      "range": [
+        "15床",
+        "16床",
+        "17床",
+        "18床",
+        "19床",
+        "20床",
+        "21床"
+      ],
+      "clientId": "",
+      "isCompleted": false
     },
     {
-      "id": "c4",
-      "name": "北部 04",
-      "peers": [
-        {
-          "id": "EiPzTGuWH",
-          "alias": "B4_mac",
-          "channel": {
-            "id": "c4",
-            "name": "北部 04"
-          }
-        },
-        {
-          "id": "5pxFPi4xr",
-          "alias": "b4-2"
-        }
-      ]
+      "name": "护士站",
+      "type": "caller",
+      "range": [
+        "护士站"
+      ],
+      "clientId": "",
+      "isCompleted": false
     },
     {
-      "id": "c5",
-      "name": "北部 05",
-      "peers": [
-        {
-          "id": "xZ5_aVn-0",
-          "alias": "B05-FF",
-          "channel": {
-            "id": "c5",
-            "name": "北部 05"
-          }
-        }
-      ]
-    },
-    {
-      "id": "c6",
-      "name": "北部 06",
-      "peers": []
-    },
-    {
-      "id": "c7",
-      "name": "北部 07",
-      "peers": []
-    },
-    {
-      "id": "c8",
-      "name": "北部 08",
-      "peers": [
-        {
-          "id": "Thw2ELLx9",
-          "alias": "08-ff",
-          "channel": {
-            "id": "c8",
-            "name": "北部 08"
-          }
-        },
-        {
-          "id": "UDaDVscVg",
-          "alias": "08-chrome"
-        }
-      ]
-    },
-    {
-      "id": "c9",
-      "name": "北部 09",
-      "peers": [
-        {
-          "id": "YXe9X9gri",
-          "alias": "09-pro2",
-          "channel": {
-            "id": "c9",
-            "name": "北部 09"
-          }
-        },
-        {
-          "id": "2baX6RRHB",
-          "alias": "09-mac",
-          "channel": {
-            "id": "c9",
-            "name": "北部 09"
-          }
-        }
-      ]
-    },
-    {
-      "id": "c10",
-      "name": "南部 01",
-      "peers": [
-        {
-          "id": "eKPtVXsLU",
-          "alias": "N1_MAC",
-          "channel": {
-            "id": "c10",
-            "name": "南部 01"
-          }
-        },
-        {
-          "id": "zr1KA7aP8",
-          "alias": "N1_PRO2"
-        }
-      ]
-    },
-    {
-      "id": "c11",
-      "name": "南部 02",
-      "peers": []
-    },
-    {
-      "id": "c12",
-      "name": "南部 03",
-      "peers": []
-    },
-    {
-      "id": "c13",
-      "name": "南部 04",
-      "peers": []
-    },
-    {
-      "id": "c14",
-      "name": "南部 05",
-      "peers": []
-    },
-    {
-      "id": "c15",
-      "name": "南部 06",
-      "peers": []
-    },
-    {
-      "id": "c16",
-      "name": "南部 07",
-      "peers": []
-    },
-    {
-      "id": "c17",
-      "name": "南部 08",
-      "peers": []
-    },
-    {
-      "id": "c18",
-      "name": "南部 09",
-      "peers": [
-        {
-          "id": "Vc_0ujSMu",
-          "alias": "ff01",
-          "channel": {
-            "id": "c18",
-            "name": "南部 09"
-          }
-        }
-      ]
-    },
-    {
-      "id": "c19",
-      "name": "南部 10",
-      "peers": [
-        {
-          "id": "2-n0v1vrI",
-          "alias": "sm01",
-          "channel": {
-            "id": "c19",
-            "name": "南部 10"
-          }
-        },
-        {
-          "id": "_ovzo194j",
-          "alias": "m5",
-          "channel": {
-            "id": "c19",
-            "name": "南部 10"
-          }
-        }
-      ]
+      "name": "探视端",
+      "type": "caller",
+      "range": [
+        "探视端"
+      ],
+      "clientId": "",
+      "isCompleted": false
     }
   ],
   "users": [
     {
       "username": "admin",
-      "password": "e10adc3949ba59abbe56e057f20f883e"
+      "password": "admin"
     }
   ]
 }

@@ -29,7 +29,7 @@ app.use('/api/*', authMiddleware);
 app.post('/authentication', function (req, res) {
     var username = req.body.username;
     var password = req.body.password;
-    password = crypto.createHash('md5').update(password).digest('hex');
+    //password = crypto.createHash('md5').update(password).digest('hex');
     var validUser = icudb.getUser(username);
     if (username === "admin" && password === validUser.password) {
         var token = crypto.createHash('md5').update(username + password).digest('hex');
@@ -45,63 +45,53 @@ app.get('/config', function(req, res){
     var cfg = JSON.parse(fs.readFileSync('config/config.json'));
     return res.send(cfg);
 });
-
-app.get('/api/channels', function (req, res) {
-    var channels = icudb.getChannels();
-    res.send(channels);
-});
-
-app.post('/api/channels/:channelid/peers', function (req, res) {
-    var channelId = req.params.channelid;
-    var alias = req.body.alias || shortid.generate();
-    var peer = {
-        id: shortid.generate(),
-        alias: alias
-    };
-    var channel = icudb.getChannel(channelId);
-    if (channel) {
-        if (channel.peers.length < 2) {
-            peer.channel = {
-                id: channel.id,
-                name: channel.name
-            };
-            icudb.addPeer(channelId,peer);
-            res.send(peer);
-        } else {
-            //peer full
-            res.status(500).send({
-                message: "此频道已满员"
-            });
-        }
-    } else {
-        //channel not found
+app.get('/api/clients', function(req, res){
+    var clients = icudb.getClients()
+    if(clients){
+        res.send(clients);
+    }else{
         res.status(404).send({
-            message: "频道不存在"
+            message: "client不存在"
+        });
+    }
+});
+app.get('/api/clients/:name', function(req, res){
+    var name = req.params.name;
+    var clients = icudb.getClient(name)
+    if(clients && clients[0]){
+        res.send(client);
+    }else{
+        res.status(404).send({
+            message: "client不存在"
         });
     }
 });
 
-app.delete('/api/channels/:channelid/peers/:peerid', function (req, res) {
-    var channelId = req.params.channelid;
-    var peerId = req.params.peerid;
-    var channel = icudb.getChannel(channelId);
-    if (channel) {
-        var peer = icudb.getPeer(channelId,peerId);
-        if(peer){
-            icudb.removePeer(channelId,peerId);
-            res.send(200);
-        } else {
-            res.status(404).send({
-                message: "未找到当前终端"
-            });
-        }
-    } else {
-        //channel not found
+app.put('/api/clients', function(req, res){
+    var name = req.body.name;
+    var clients = icudb.setClient(name, shortid.generate())
+    if(client){
+        res.send(client);
+    }else{
         res.status(404).send({
-            message: "频道不存在"
+            message: "client不存在"
         });
     }
 });
+
+app.remove('/api/clients/:id', function(req, res){
+    var id = req.params.id;
+    var client = icudb.removeClient(id);
+    if(client){
+        res.send(client);
+    }else{
+        res.status(404).send({
+            message: "client不存在"
+        });
+    }
+});
+
+
 
 function authMiddleware(req, res, next) {
     if (sessionPool[req.session.id] && sessionPool[req.session.id] === req.session.token) {
