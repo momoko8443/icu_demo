@@ -27,8 +27,8 @@
         "13床",
         "14床"
       ],
-      "clientId": "XmkqZckId",
-      "isCompleted": true
+      "clientId": "",
+      "isCompleted": false
     },
     {
       "name": "3号病区",
@@ -51,8 +51,8 @@
       "range": [
         "护士站"
       ],
-      "clientId": "",
-      "isCompleted": false
+      "clientId": "2SZIgLnFW",
+      "isCompleted": true
     },
     {
       "name": "探视端",
@@ -60,8 +60,8 @@
       "range": [
         "探视端"
       ],
-      "clientId": "",
-      "isCompleted": false
+      "clientId": "v9wqnhIqX",
+      "isCompleted": true
     }
   ],
   "users": [

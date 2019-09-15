@@ -37,12 +37,18 @@
     <login id="login" uku-render="appCtrl.currentStage === 'login'" 
         uku-onloginsuccessevent="appCtrl.loginSuccessEventHandler()"
         uku-oncancellogin="appCtrl.cancelLoginHandler()"></login>
-    <exit-channel id="exitChannel" uku-peer="appCtrl.peer" uku-render="appCtrl.currentStage === 'exitChannel'"
-        uku-onsettingsdeleted="appCtrl.settingsDeletedHandler()"
-        uku-oncancelexitchannel="appCtrl.cancelExitChannelHandler()"></exit-channel>
     <choose-client id="chooseClient" uku-render="appCtrl.currentStage === 'chooseClient'"
         uku-onsettingssaved="appCtrl.settingsSavedHandler()"
         uku-oncancelchooseclient="appCtrl.cancelChooseClientHandler()"></choose-client>
+    <unbind-client id="unbindClient" uku-render="appCtrl.currentStage === 'unbindClient'"
+        uku-client="appCtrl.client"
+        uku-onsettingsdeleted="appCtrl.settingsDeletedHandler()"
+        uku-oncancelexitchannel="appCtrl.cancelExitChannelHandler()">
+    </unbind-client>
+    <standby id="standby" uku-render="appCtrl.currentStage === 'standby'" 
+        uku-onjoinroom="appCtrl.joinRoomHandler()"
+        uku-onexitstandy="appCtrl.exitStandby()">
+    </standby>
     <video-chat id="videoChat" uku-render="appCtrl.currentStage === 'videoChat'"
         uku-oncancelcalling="appCtrl.cancelcallingHandler()"
         uku-onexitvideochat="appCtrl.exitVideoChatHandler()"
@@ -60,7 +66,8 @@
     uku.registerComponent('welcome','demos/components/welcome.html');
     uku.registerComponent('login','demos/components/login.html');
     uku.registerComponent('choose-client','demos/components/chooseClient.html');
-    uku.registerComponent('exit-channel','demos/components/exitChannel.html');
+    uku.registerComponent('standby','demos/components/standby.html');
+    uku.registerComponent('unbind-client','demos/components/unbindClient.html');
     uku.registerComponent('video-chat','demos/components/videoChat.html');
     uku.registerController('appCtrl', appCtrl);
     uku.init();
@@ -70,21 +77,25 @@
 
     function ApplicationController(uku) {
         var self = this;
+        
         this.currentStage = "welcome";
-        this.peer = {};
+        this.client = {};
         var isRegister = false;
         var socket;
         var welcomePage;
         var loginPage;
         var chooseClientPage;
-        var exitChannelPage;
+        var unbindClientPage;
         var videoChatPage;
+        var standbyPage;
+        var currentTarget;
 
         this.init = function(){
             welcomePage = document.getElementById('welcome');
             loginPage = document.getElementById('login');
             chooseClientPage = document.getElementById('chooseClient');
-            exitChannelPage = document.getElementById('exitChannel');
+            unbindClientPage = document.getElementById('unbindClient');
+            standbyPage = document.getElementById('standby');
             videoChatPage = document.getElementById('videoChat');
             
             if(localStorage.getItem('client')){
@@ -103,17 +114,19 @@
                 socket = io(location.href);
                 socket.on('client_connected', function (data) {
                     console.log(data);
-                    socket.emit('join_room', { room: self.peer.channel.id });
+                    console.log('connected socket server');
+                    socket.emit('client_info',{clientId:self.client.clientId});
+                    //socket.emit('join_room', { room: self.peer.channel.id });
                 });
 
                 socket.on('peer_exit',function(data){
-                    if(data.self !== self.peer.id && self.currentStage === 'videoChat'){
+                    if(self.currentStage === 'videoChat'){
                         var videoChatInstance = uku.getComponentController('videoChat');
-                        videoChatInstance.peerExit();
+                        videoChatInstance.exit();
                     }  
                 });
                 socket.on('cancel_calling',function(data){
-                    if(data.self !== self.peer.id && self.currentStage === 'videoChat'){
+                    if(self.currentStage === 'videoChat'){
                         var videoChatInstance = uku.getComponentController('videoChat');
                         videoChatInstance.reject();
                     }
@@ -123,7 +136,8 @@
                     location.reload();
                 });
                 socket.on('hangup_call', function(data){
-                    if(data.self !== self.peer.id && self.currentStage === 'videoChat'){
+                    if(self.currentStage === 'videoChat'){
+                        alert('被挂断!');
                         var videoChatInstance = uku.getComponentController('videoChat');
                         videoChatInstance.beHangUp();
                     } 
@@ -135,13 +149,12 @@
             };
             this.enterEventHandler = function(e, callback){
                 if(isRegister){
-                    if(socket){
-                        switchView(e.currentTarget,videoChatPage,function(){
-                            var videoChatInstance = uku.getComponentController('videoChat');
-                            videoChatInstance.init(self.peer, vidoeChatCfg);
+                        switchView(e.currentTarget,standbyPage,function(){
+                            var standbyInstance = uku.getComponentController('standby');
+                            standbyInstance.init(socket);
                             callback && callback();
                         })
-                    }
+                    
                 }else{
                     switchView(e.currentTarget, loginPage, function(){
                         callback && callback();
@@ -151,7 +164,7 @@
 
             this.loginSuccessEventHandler = function(e){
                 if(isRegister){
-                    switchView(e.currentTarget,exitChannelPage);
+                    switchView(e.currentTarget,unbindClientPage);
                 }else{
                     switchView(e.currentTarget,chooseClientPage,function(){
                         var chooseClientInstance = uku.getComponentController('chooseClient');
@@ -177,16 +190,36 @@
                 switchView(e.currentTarget,welcomePage);
             };
             this.exitVideoChatHandler = function(e){
-                switchView(e.currentTarget,welcomePage,function(){
-                    socket.emit('peer_exit',{ self:self.peer.id,room: self.peer.channel.id });                 
+                let room = e.data.room;
+                switchView(e.currentTarget,standbyPage,function(){
+                    socket.emit('peer_exit',{ "room": room});                 
                 });
+                location.reload();
             };
             this.cancelcallingHandler = function(e){
-                socket.emit('cancel_calling',{ self:self.peer.id,room: self.peer.channel.id });
+                let room = e.data.room;
+                socket.emit('cancel_calling',{"room": room });
             };
-            this.hangUpCallHandler = function(){
-                socket.emit('hangup_call',{ self:self.peer.id,room: self.peer.channel.id });
-            }
+            this.hangUpCallHandler = function(e){
+                let room = e.data.room;
+                socket.emit('hangup_call',{ "room": room});
+                // switchView(e.currentTarget,standbyPage,function(){
+                //     var standbyInstance = uku.getComponentController('standby');
+                //     standbyInstance.init(socket);
+                // });
+                location.reload();
+            };
+
+            this.joinRoomHandler = function(e){
+                var room = e.data.room;
+                switchView(e.currentTarget,videoChatPage,function(){
+                    var videoChatInstance = uku.getComponentController('videoChat');
+                    videoChatInstance.init(room,vidoeChatCfg);
+                });
+            };
+            this.exitStandby = function(e){
+                switchView(e.currentTarget,welcomePage);
+            };
             var vidoeChatCfg;
             getCfg().then(function(result){
                 //console.log(result);
@@ -200,6 +233,7 @@
             function switchView(oldView,newView,callback){
                 $(oldView).animateCss('fadeOut', function(){
                     self.currentStage = newView.id;
+                    currentTarget = newView;
                     uku.refresh();
                     $(newView).animateCss('fadeIn');
                     if(callback && typeof callback === 'function'){

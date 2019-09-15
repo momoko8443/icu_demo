@@ -61,8 +61,8 @@ function IcuDB() {
     this.getUser = function(username){
         return db.get('users').find({username: username}).value();
     };
-    this.getClients = function(){
-        return db.get('clients').filter({isCompleted: false}).value();
+    this.getClients = function(filter){
+        return db.get('clients').filter(filter).value();
     };
 
     this.getClient = function(alias){
@@ -71,10 +71,8 @@ function IcuDB() {
         }).value();
     };
 
-    this.setClient = function(alias, clientId){
-        return db.get('clients').filter((o)=>{
-            return _.includes(o.range,alias);
-        }).head().assign({ 'clientId': clientId, 'isCompleted': true }).write();
+    this.setClient = function(name, clientId){
+        return db.get('clients').find({'name':name}).assign({ 'clientId': clientId, 'isCompleted': true }).write();
     };
 
     this.removeClient = function(clientId){

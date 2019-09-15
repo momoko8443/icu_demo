@@ -23,7 +23,7 @@ app.use(session({
     }
 }));
 
-app.use('/api/*', authMiddleware);
+//app.use('/api/*', authMiddleware);
 
 
 app.post('/authentication', function (req, res) {
@@ -45,8 +45,18 @@ app.get('/config', function(req, res){
     var cfg = JSON.parse(fs.readFileSync('config/config.json'));
     return res.send(cfg);
 });
-app.get('/api/clients', function(req, res){
-    var clients = icudb.getClients()
+app.get('/api/uncompleted_clients', function(req, res){
+    var clients = icudb.getClients({isCompleted:false});
+    if(clients){
+        res.send(clients);
+    }else{
+        res.status(404).send({
+            message: "client不存在"
+        });
+    }
+});
+app.get('/api/completed_clients', function(req, res){
+    var clients = icudb.getClients({isCompleted:true});
     if(clients){
         res.send(clients);
     }else{
@@ -67,9 +77,9 @@ app.get('/api/clients/:name', function(req, res){
     }
 });
 
-app.put('/api/clients', function(req, res){
+app.put('/api/clients', authMiddleware,function(req, res){
     var name = req.body.name;
-    var clients = icudb.setClient(name, shortid.generate())
+    var client = icudb.setClient(name, shortid.generate())
     if(client){
         res.send(client);
     }else{
@@ -79,7 +89,7 @@ app.put('/api/clients', function(req, res){
     }
 });
 
-app.remove('/api/clients/:id', function(req, res){
+app.delete('/api/clients/:id', authMiddleware, function(req, res){
     var id = req.params.id;
     var client = icudb.removeClient(id);
     if(client){
