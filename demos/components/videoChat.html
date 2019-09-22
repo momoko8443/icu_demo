@@ -24,33 +24,37 @@
                 <div class="console">
                     <div class="buttonBox">
                         <div uku-render="cc.currentState ==='standby'">
-                            <button type="button" class="pure-button button-success" uku-onclick="cc.call()">
-                                <!-- 呼叫 -->
+                            <button type="button" class="pure-button button-success" style="margin-right:20px" uku-onclick="cc.call()">
+                                <!-- call -->
                                 <i class="fa fa-phone" style="font-size:3em"></i>
+                            </button>
+                            <button type="button" class="pure-button button-error" style="margin-left:20px" uku-onclick="cc.exit()">
+                                <!-- exit -->
+                                <i class="fa fa-sign-out" style="font-size:3em"></i>
                             </button>
                         </div>
                         <div uku-render="cc.currentState ==='calling'">
                             <button type="button" class="pure-button button-error" uku-onclick="cc.cancelCall()">
-                                <!-- 取消呼叫 -->
+                                <!-- cancel call -->
                                 <i class="fa fa-ban" style="font-size:3em"></i>
                             </button>
                         </div>
                         <div uku-render="cc.currentState==='called'">
                             <button type="button" class="pure-button button-success" style="margin-right:20px"
                                 uku-onclick="cc.accept()">
-                                <!-- 接听 -->
+                                <!-- accept -->
                                 <i class="fa fa-phone" style="font-size:3em"></i>
                             </button>
                             <button type="button" class="pure-button button-error" style="margin-left:20px" uku-onclick="cc.reject()">
-                                <!-- 拒绝 -->
+                                <!-- reject -->
                                 <i class="fa fa-ban" style="font-size:3em"></i>
                             </button>
                         </div>
                         <div uku-render="cc.currentState==='inMeeting'">
-                            <!-- 剩余时间 -->
+                            <!-- time left -->
                             <h4 id="timeleft" style="text-align: center; -webkit-text-stroke-color: black;text-shadow: 2px 2px 2px #000000;">{{'剩余:' + cc.timeDisplay}}</h4>
                             <button type="button" class="pure-button button-error" uku-onclick="cc.hangUp()">
-                                <!-- 挂断 -->
+                                <!-- hangup -->
                                 <i class="fa fa-ban" style="font-size:3em"></i>
                             </button>
                         </div>
@@ -85,7 +89,6 @@
                 this.currentState = '';
                 this.time = 0;
                 this.timeDisplay = "";
-                this.peer = null;
                 this.showLog = false;
                 this.logs = "";
                 this.modalMessage = "";
@@ -105,6 +108,10 @@
                 let bytesPrev;
                 let devicePixleRatio = 2;
                 let isActiveExit = false;
+                let my;
+                if(localStorage.getItem('client')){
+                   my = JSON.parse(localStorage.getItem('client'));
+                }
                 this.hideLogHandler = function () {
                     this.showLog = false;
                 };
@@ -131,7 +138,6 @@
 
                 this.exit = function (e, isActive) {
                     resetFlags(config);
-                    var room = self.peer.channel.id;
                     this.currentState = "exit"
                     easyrtc.leaveRoom(room,
                         function successCB(roomName) {
@@ -144,8 +150,6 @@
                             alert('Leave room: ' + roomName + 'failed. ' + errorCode + ' ' + errorText);
                         }
                     );
-
-
                 };
 
                 this.peerExit = function () {
@@ -153,25 +157,24 @@
                     uku.refresh();
                 };
 
-                this.init = function (peer, cfg) {
+                this.init = function (_room, cfg) {
                     //alert('w '+$('body').width());
                     //alert('h '+$('body').height());
                     selfVideoDom = document.getElementById('selfVideo');
                     var videoW = $('body').width() * devicePixleRatio;
                     var videoH = $('body').height() * devicePixleRatio;
-                    room = peer.channel.id;
+                    room = _room;
                     config = cfg;
                     this.currentState = 'init';
-                    this.peer = peer;
                     uku.refresh();
                     easyrtc.setVideoDims(videoW, videoH);
-                    easyrtc.setUsername(peer.alias);
+                    easyrtc.setUsername(my.name);
                     easyrtc.setRoomOccupantListener(roomOccupantHandler);
                     easyrtc.setDisconnectListener(function () {
                         if (isActiveExit) {
                             easyrtc.closeLocalMediaStream();
                             log('setDisconnectListener: disconnect success');
-                            self.fire('exitvideochat');
+                            self.fire('exitvideochat',{'room':room});
                         }
                     });
                     var localFilter = easyrtc.buildLocalSdpFilter({
@@ -230,8 +233,6 @@
                         performCall(callerId);
                         this.currentState = 'calling';
                     }
-
-
                 };
 
                 var initiativelyCancelFlag = false;
@@ -239,7 +240,7 @@
 
                 this.cancelCall = function () {
                     if (enableCancel) {
-                        this.fire('cancelcalling');
+                        this.fire('cancelcalling',{'room':room});
                         this.currentState = 'standby';
                         initiativelyCancelFlag = true;
                         log('this.cancelCall -> standby');
@@ -250,16 +251,17 @@
                     easyrtc.hangup(callerId);
                     window.localStorage.removeItem("time_left");
                     this.currentState = 'standby';
-                    this.fire('hangupcall');
-                    log('this.hangUp -> standby');
                     uku.refresh();
+                    log('this.hangUp -> fire hangupcall');
+                    this.fire('hangupcall',{'room':room});     
                 };
 
                 this.beHangUp = function () {
                     window.localStorage.removeItem("time_left");
                     this.currentState = 'standby';
-                    log('this.beHangUp -> standby');
+                    log('this.beHangUp -> fire behangupcall');
                     uku.refresh();
+                    this.exit();
                 };
 
                 var timerEditMode;

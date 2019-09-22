@@ -2,6 +2,7 @@
   "clients": [
     {
       "name": "1号病区",
+      "color": "",
       "type": "callee",
       "range": [
         "1床",
@@ -17,6 +18,7 @@
     },
     {
       "name": "2号病区",
+      "color": "",
       "type": "callee",
       "range": [
         "8床",
@@ -32,6 +34,7 @@
     },
     {
       "name": "3号病区",
+      "color": "",
       "type": "callee",
       "range": [
         "15床",
@@ -47,6 +50,7 @@
     },
     {
       "name": "护士站",
+      "color": "",
       "type": "caller",
       "range": [
         "护士站"

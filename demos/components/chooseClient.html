@@ -1,0 +1,119 @@
+<uku-component>
+        <template>
+            <div style="height: 100%;">
+                <div class="center">
+                    <div id="bg"></div>
+                    <div class="center">
+                        <form class="pure-form">
+                            <fieldset>
+                                <legend>分配客户端</legend>
+                                <select style="width: 190px;" uku-selected="cc.selectedClient|name" uku-onchange="cc.hiddenErrorMsg()">
+                                    <option uku-repeat="client in cc.availableClients" uku-value="client.name" uku-data-item="client" uku-text="client.name"></option>
+                                </select>
+                            </fieldset>
+                            <span id="errorMsg" class="errorMsg" uku-text="cc.errorMs">
+                            </span>
+                            <fieldset>
+                                <button type="button" class="pure-button pure-button-primary" style="margin-right: 50px" uku-onclick="cc.save()">保存</a>
+                                <button type="button" class="pure-button" uku-onclick="cc.cancel()">取消</a>
+                            </fieldset>
+                        </form>
+                    </div>
+                </div> 
+            </div>
+        </template>
+        <script>
+            (function(ajax, jq){
+                return function(uku){
+                    this.clients = [];
+                    this.availableClients = [];
+                    this.selectedClient = {};
+                    this.alias = '';
+                    this.errorMsg = '';
+                    if(localStorage.getItem('client')){
+                        //this.alias = JSON.parse(localStorage.getItem('client')).alias;
+                    }
+                    var self = this;
+                    var errMsg = jq('#errorMsg');
+                    this.init = function(){
+                        getClients({isCompleted:false});
+                    }
+
+                    this.save = function(){
+                        var clientName = this.selectedClient.name;
+                        alert(clientName);
+                        if(clientName){
+                            ajax.put('/api/clients',{name:clientName})
+                            .then(function(res){
+                                var client = res.data;
+                                localStorage.setItem('client',JSON.stringify(client));
+                                self.fire('settingssaved');
+                            })
+                            .catch(function(err){
+                                self.errorMsg = err.message;
+                                uku.refresh();
+                                errMsg.show();
+                                errMsg.animateCss('fadeIn');
+                            })
+                        }
+                    };
+                    this.hiddenErrorMsg = function(){
+                        if(errMsg.is(':visible')){
+                            errMsg.animateCss('fadeOut', function(){
+                                errMsg.hide();
+                            });
+                        }
+                    };
+                    this.cancel = function(){
+                        this.fire('cancelchooseclient');
+                    };
+
+                    function getClients(){
+                        ajax.get('/api/uncompleted_clients')
+                        .then(function(res){
+                            self.clients = res.data;
+                            self.availableClients = self.clients;//wrapChannels(self.channels);
+                            self.selectedClient = self.availableClients[0];
+                            uku.refresh();
+                        })
+                        .catch(function(err){
+                            console.log(err);
+                        })
+                    }
+                };
+            })(axios, $);
+        </script>
+        <style>
+            legend{
+                color:#795548;
+            }
+
+            .errorMsg{
+                background: red;
+                color: white;
+                padding: 5px 10px;
+                border-radius: 5px;
+                display: none;
+            }
+            
+            .center{
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+
+            .button-xlarge {
+                font-size: 125%;
+            }
+            #bg{
+                width: 1000px;
+                height: 400px;
+                background-position:center;
+                background-repeat: no-repeat;
+                background-image: url("demos/images/icu/hospital.jpeg");
+                -webkit-filter: blur(3px);
+                filter: blur(3px);
+            }
+        </style>
+    </uku-component>

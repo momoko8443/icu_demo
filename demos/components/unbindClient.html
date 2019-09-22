@@ -1,0 +1,80 @@
+<uku-component>
+    <template>
+        <div style="height: 100%;">
+            <div class="center">
+                <div id="bg"></div>
+                <div class="center">
+                    <form class="pure-form">
+                        <fieldset>
+                            <legend>客户端名</legend>
+                            <h4 uku-text="cc.myClient.name"></h4>
+                        </fieldset>
+                        <fieldset>
+                            <button type="button" class="pure-button pure-button-primary" style="margin-right: 50px" uku-onclick="cc.unbind()">解除绑定</a>
+                            <button type="button" class="pure-button" uku-onclick="cc.cancel()">取消</a>
+                        </fieldset>
+                    </form>
+                </div>
+            </div> 
+        </div>
+    </template>
+    <script>
+        (function(ajax, jq){
+            return function(uku){
+                this.myClient = {};
+                var self = this;
+                Object.defineProperty(this, 'client', {
+                    set: function(value){
+                        if(value){
+                            this.myClient = value;
+                        }
+                    }
+                });
+
+                this.unbind = function(){
+                    ajax.delete('/api/clients/'+ this.myClient.clientId)
+                    .then(function(res){
+                        localStorage.removeItem('client');
+                        self.fire('settingsdeleted');
+                    })
+                    .catch(function(err){
+                        console.log(err.response.data.message);
+                        if(err.response.status === 404){
+                            localStorage.removeItem('client');
+                            self.fire('settingsdeleted');
+                        }
+                    });
+                };
+
+                this.cancel = function(){
+                    this.fire('cancelexitchannel');
+                };
+            };
+        })(axios, $);
+    </script>
+    <style>
+        legend{
+            color:#795548;
+        }
+        
+        .center{
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .button-xlarge {
+            font-size: 125%;
+        }
+        #bg{
+            width: 1000px;
+            height: 400px;
+            background-position:center;
+            background-repeat: no-repeat;
+            background-image: url("demos/images/icu/hospital.jpeg");
+            -webkit-filter: blur(3px);
+            filter: blur(3px);
+        }
+    </style>
+</uku-component>

@@ -1,0 +1,139 @@
+<uku-component>
+    <template>
+        <div style="height: 100%;" uku-ontouchend="cc.touchEndHandler()">
+            <div id="clientContainer" class="clientContainer">
+                <div uku-repeat="client in cc.clients" class="gridItem" uku-style="cc.gridColor(client)" uku-onclick="cc.createRoom(client)">
+                    {{client.name}}
+                </div>
+            </div>
+        </div>
+    </template>
+    <script>
+        (function(ajax, jq){
+            return function(uku){
+                this.my = {};
+                this.clients = [];
+                this.selectedClient = {};
+                this.errorMsg = '';
+                if(localStorage.getItem('client')){
+                    this.my = JSON.parse(localStorage.getItem('client'));
+                }
+                var self = this;
+                var errMsg = jq('#errorMsg');
+                var selfClient;
+                var socket;
+                var standByMain;
+                this.init = function(_socket){
+                    standByMain = document.getElementById('clientContainer');
+                    getClients();
+                    socket = _socket;
+                    socket.on('invite_join_room',function(data){
+                        if(data.to === self.my.clientId){
+                            //alert('来自'+ data.from+'的开房邀请,房间号:'+data.room);
+                            socket.emit('join_room', {room: data.room});
+                            self.fire('joinroom',{room: data.room});
+                        }
+                    });
+                }
+               
+                this.hiddenErrorMsg = function(){
+                    if(errMsg.is(':visible')){
+                        errMsg.animateCss('fadeOut', function(){
+                            errMsg.hide();
+                        });
+                    }
+                };
+                this.cancel = function(){
+                    this.fire('cancelchooseclient');
+                };
+                this.createRoom = function(e,client){
+                    let room =  this.my.clientId + '_' + client.clientId;
+                    socket.emit('create_room',{room:room,from:this.my.clientId, to:client.clientId});
+                    this.fire('joinroom',{room: room});
+                };
+                this.gridColor = function(client){
+                    let bgColor = client.color ? client.color : 'red';
+                    return {"background": bgColor};
+                };
+
+                var timerEditMode;
+                var touchedCount = 0;
+                this.touchEndHandler = function (e) {
+                    if (e.target !== standByMain) {
+                        return;
+                    }
+                    if (touchedCount === 0) {
+                        timerEditMode = setTimeout(function () {
+                            touchedCount = 0;
+                            clearInterval(timerEditMode);
+                        }, 5000);
+                    } else if (touchedCount === 7) {
+                        touchedCount = 0;
+                        clearInterval(timerEditMode);
+                        self.fire('exitstandy');
+                        // self.exit(true);
+                    }
+                    touchedCount++;
+                    console.log(touchedCount);
+                };
+                function getClients(){
+                        ajax.get('/api/completed_clients')
+                        .then(function(res){
+                            //console.log(res);
+                            let arr = [];
+                            let nodes = res.data;
+                            for(let i=0;i<nodes.length;i++){
+                                let node = nodes[i];
+                                if(node.name !== self.my.name){
+                                    for(let j=0;j<node.range.length;j++){
+                                        let client = {
+                                            name: node.range[j],
+                                            clientId: node.clientId
+                                        }
+                                        arr.push(client);
+                                    }
+                                }
+                            }
+                            self.clients = arr;
+                            uku.refresh();
+                        })
+                        .catch(function(err){
+                            console.log(err);
+                        })
+                    }
+            };
+        })(axios, $);
+    </script>
+    <style>
+        legend{
+            color:#795548;
+        }
+
+        .errorMsg{
+            background: red;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            display: none;
+        }
+        .clientContainer{
+            height: 100%;
+            padding: 50px;
+            display: grid;
+            grid-template-columns: 25% 25% 25% 25%;
+            /* grid-template-rows: 25% 25% 25% 25% 25% 25% ; */
+            grid-column-gap: 20px;
+            grid-row-gap: 20px;
+            justify-items: center;
+        }
+        .gridItem{
+            height: 80px;
+            width: 120px;
+            background:brown;
+            border-radius: 5px;
+            border:  1px black solid;
+            cursor: pointer;
+            text-align: center;
+        }
+    </style>
+</uku-component>
