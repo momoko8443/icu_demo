@@ -34,8 +34,18 @@
                             self.fire('joinroom',{room: data.room});
                         }
                     });
-                }
-               
+                    easyrtc.getVideoSourceList( function(list) {
+                        var i;
+                        for( i = 0; i < list.length; i++ ) {
+                            //alert("label=" + list[i].label + ", id= " + list[i].id);
+
+                            if(list[i].label.indexOf('front') > 0){  // Searching for label containing back (for back camera)
+                                easyrtc.setVideoSource(list[i].deviceId); 
+                                break;
+                            }
+                        }
+                    });
+                };
                 this.hiddenErrorMsg = function(){
                     if(errMsg.is(':visible')){
                         errMsg.animateCss('fadeOut', function(){
@@ -88,7 +98,8 @@
                                     for(let j=0;j<node.range.length;j++){
                                         let client = {
                                             name: node.range[j],
-                                            clientId: node.clientId
+                                            clientId: node.clientId,
+                                            color: node.color
                                         }
                                         arr.push(client);
                                     }
@@ -129,7 +140,6 @@
         .gridItem{
             height: 80px;
             width: 120px;
-            background:brown;
             border-radius: 5px;
             border:  1px black solid;
             cursor: pointer;
