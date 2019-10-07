@@ -1,9 +1,12 @@
 <uku-component>
     <template>
         <div style="height: 100%;" uku-ontouchend="cc.touchEndHandler()">
-            <div id="clientContainer" class="clientContainer">
+            <div uku-render="cc.my.type === 'callee' " id="clientContainer2"  class="clientContainer2">
+                <span class="clientName2">{{cc.my.name + ',等待被呼叫...' }}</span>
+            </div>
+            <div uku-render="cc.my.type === 'caller' " id="clientContainer" class="clientContainer">
                 <div uku-repeat="client in cc.clients" class="gridItem" uku-style="cc.gridColor(client)" uku-onclick="cc.createRoom(client)">
-                    {{client.name}}
+                    <span class="clientName">{{client.name}}</span>
                 </div>
             </div>
         </div>
@@ -23,8 +26,10 @@
                 var selfClient;
                 var socket;
                 var standByMain;
+                var standByMain2;
                 this.init = function(_socket){
                     standByMain = document.getElementById('clientContainer');
+                    standByMain2 = document.getElementById('clientContainer2');
                     getClients();
                     socket = _socket;
                     socket.on('invite_join_room',function(data){
@@ -69,7 +74,7 @@
                 var timerEditMode;
                 var touchedCount = 0;
                 this.touchEndHandler = function (e) {
-                    if (e.target !== standByMain) {
+                    if (e.target !== standByMain && e.target !== standByMain2) {
                         return;
                     }
                     if (touchedCount === 0) {
@@ -131,11 +136,19 @@
             height: 100%;
             padding: 50px;
             display: grid;
-            grid-template-columns: 25% 25% 25% 25%;
-            /* grid-template-rows: 25% 25% 25% 25% 25% 25% ; */
-            grid-column-gap: 20px;
-            grid-row-gap: 20px;
+            grid-template-columns: 20% 20% 20% 20% 20%;
+            grid-template-rows: 20% 20% 20% 20% 20%;
+            grid-column-gap: 10px;
+            grid-row-gap: 10px;
             justify-items: center;
+        }
+        .clientContainer2{
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items:center;
+            justify-content:center;
         }
         .gridItem{
             height: 80px;
@@ -144,6 +157,13 @@
             border:  1px black solid;
             cursor: pointer;
             text-align: center;
+        }
+        .clientName{
+            font-size: 32px;
+        }
+        .clientName2{
+            font-size: 80px;
+            color: white;
         }
     </style>
 </uku-component>

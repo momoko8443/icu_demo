@@ -137,7 +137,7 @@
                 });
                 socket.on('hangup_call', function(data){
                     if(self.currentStage === 'videoChat'){
-                        alert('被挂断!');
+                        //alert('被挂断!');
                         var videoChatInstance = uku.getComponentController('videoChat');
                         videoChatInstance.beHangUp();
                     } 

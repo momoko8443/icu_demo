@@ -138,18 +138,24 @@
 
                 this.exit = function (e, isActive) {
                     resetFlags(config);
-                    this.currentState = "exit"
+                    this.currentState = "exit";
+                    timerAutoRefresh = setTimeout(function(){
+                        window.location.reload();
+                    },3000);
                     easyrtc.leaveRoom(room,
                         function successCB(roomName) {
+                            clearTimeout(timerAutoRefresh);
                             log('Leave room: ' + roomName + ' success.');
                             isActiveExit = true;
                             easyrtc.disconnect();
                         },
                         function failCB(errorCode, errorText, roomName) {
+                            window.location.reload();
                             log('Leave room: ' + roomName + 'failed. ' + errorCode + ' ' + errorText);
-                            alert('Leave room: ' + roomName + 'failed. ' + errorCode + ' ' + errorText);
+                            //alert('Leave room: ' + roomName + 'failed. ' + errorCode + ' ' + errorText);
                         }
                     );
+                    
                 };
 
                 this.peerExit = function () {
