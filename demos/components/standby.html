@@ -6,7 +6,8 @@
             </div>
             <div uku-render="cc.my.type === 'caller' " id="clientContainer" class="clientContainer">
                 <div uku-repeat="client in cc.clients" class="gridItem" uku-style="cc.gridColor(client)" uku-onclick="cc.createRoom(client)">
-                    <span class="clientName">{{client.name}}</span>
+                    <div class="clientName">{{client.name}}</div>
+                    <img  uku-render="client.type === 'callee'" src="demos/images/icu/bed2.svg" width="50px">
                 </div>
             </div>
         </div>
@@ -36,7 +37,7 @@
                         if(data.to === self.my.clientId){
                             //alert('来自'+ data.from+'的开房邀请,房间号:'+data.room);
                             socket.emit('join_room', {room: data.room});
-                            self.fire('joinroom',{room: data.room});
+                            self.fire('joinroom',{room: data.room,toName:data.toName});
                         }
                     });
                     easyrtc.getVideoSourceList( function(list) {
@@ -63,8 +64,8 @@
                 };
                 this.createRoom = function(e,client){
                     let room =  this.my.clientId + '_' + client.clientId;
-                    socket.emit('create_room',{room:room,from:this.my.clientId, to:client.clientId});
-                    this.fire('joinroom',{room: room});
+                    socket.emit('create_room',{room:room,from:this.my.clientId, to:client.clientId,fromName:this.my.name,toName:client.name});
+                    this.fire('joinroom',{room: room, toName: client.name});
                 };
                 this.gridColor = function(client){
                     let bgColor = client.color ? client.color : 'red';
@@ -104,7 +105,8 @@
                                         let client = {
                                             name: node.range[j],
                                             clientId: node.clientId,
-                                            color: node.color
+                                            color: node.color,
+                                            type: node.type
                                         }
                                         arr.push(client);
                                     }
@@ -156,7 +158,10 @@
             border-radius: 5px;
             border:  1px black solid;
             cursor: pointer;
-            text-align: center;
+            /* text-align: center; */
+            display: flex;
+            justify-items: center;
+            justify-content: center;
         }
         .clientName{
             font-size: 32px;

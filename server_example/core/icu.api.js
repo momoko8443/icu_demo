@@ -101,12 +101,29 @@ app.delete('/api/clients/:id', authMiddleware, function(req, res){
     }
 });
 
+app.delete('/api/clients', authAPIMiddleware, function(req, res){
+    icudb.removeAllClients();
+    res.sendStatus(200);
+});
+
 
 
 function authMiddleware(req, res, next) {
     if (sessionPool[req.session.id] && sessionPool[req.session.id] === req.session.token) {
         next();
     } else {
+        res.sendStatus(401);
+    }
+}
+
+function authAPIMiddleware(req, res, next){
+    let pwd = "admin:admin";
+    let code = 'Basic ' + Buffer.from(pwd).toString('base64');//YWRtaW46YWRtaW4=
+    console.log('code',code);
+    console.log('head', JSON.stringify(req.headers['authorization']));
+    if(req.headers['authorization'] && req.headers['authorization'] === code){
+        next();
+    }else{
         res.sendStatus(401);
     }
 }

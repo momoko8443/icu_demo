@@ -78,6 +78,13 @@ function IcuDB() {
     this.removeClient = function(clientId){
         return db.get('clients').find({'clientId': clientId}).assign({ 'clientId': '', 'isCompleted': false }).write();
     }
+
+    this.removeAllClients = function(){
+        return db.get('clients').filter({'isCompleted': true}).each((item)=>{
+            item.clientId = '';
+            item.isCompleted = false;
+        }).write();
+    }
 }
 
 module.exports = new IcuDB();

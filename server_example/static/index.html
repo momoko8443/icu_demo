@@ -212,9 +212,10 @@
 
             this.joinRoomHandler = function(e){
                 var room = e.data.room;
+                var toName = e.data.toName;
                 switchView(e.currentTarget,videoChatPage,function(){
                     var videoChatInstance = uku.getComponentController('videoChat');
-                    videoChatInstance.init(room,vidoeChatCfg);
+                    videoChatInstance.init(room,vidoeChatCfg,toName);
                 });
             };
             this.exitStandby = function(e){

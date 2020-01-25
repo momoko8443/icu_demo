@@ -38,11 +38,9 @@
                         self.fire('settingsdeleted');
                     })
                     .catch(function(err){
-                        console.log(err.response.data.message);
-                        if(err.response.status === 404){
-                            localStorage.removeItem('client');
-                            self.fire('settingsdeleted');
-                        }
+                        alert(err.response.data.message);                    
+                        localStorage.removeItem('client');
+                        self.fire('settingsdeleted');
                     });
                 };
 

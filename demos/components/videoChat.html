@@ -109,6 +109,7 @@
                 let devicePixleRatio = 2;
                 let isActiveExit = false;
                 let my;
+                let toName = '';
                 if(localStorage.getItem('client')){
                    my = JSON.parse(localStorage.getItem('client'));
                 }
@@ -163,7 +164,7 @@
                     uku.refresh();
                 };
 
-                this.init = function (_room, cfg) {
+                this.init = function (_room, cfg, _toName) {
                     //alert('w '+$('body').width());
                     //alert('h '+$('body').height());
                     selfVideoDom = document.getElementById('selfVideo');
@@ -171,6 +172,7 @@
                     var videoH = $('body').height() * devicePixleRatio;
                     room = _room;
                     config = cfg;
+                    toName = _toName;
                     this.currentState = 'init';
                     uku.refresh();
                     easyrtc.setVideoDims(videoW, videoH);
@@ -531,9 +533,15 @@
                             break;
                         case 'calling':
                             self.message = '正在呼叫 ' + self.otherClientName;
+                            if(toName){
+                                self.message += '(' + toName + ')';
+                            }
                             break;
                         case 'called':
                             self.message = self.otherClientName + ' 的来电';
+                            if(toName){
+                                self.message += ', 呼叫 (' + toName + ')';
+                            }
                             break;
                         case 'inMeeting':
                             self.message = '通话中...';
