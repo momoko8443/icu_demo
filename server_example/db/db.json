@@ -13,7 +13,7 @@
         "6床",
         "7床"
       ],
-      "clientId": "V4vyeX-JF",
+      "clientId": "qHcv-_WaI",
       "isCompleted": true
     },
     {
@@ -29,8 +29,8 @@
         "13床",
         "14床"
       ],
-      "clientId": "SkaaFxPLn",
-      "isCompleted": true
+      "clientId": "",
+      "isCompleted": false
     },
     {
       "name": "3号病区",
@@ -45,8 +45,8 @@
         "20床",
         "21床"
       ],
-      "clientId": "",
-      "isCompleted": false
+      "clientId": "g5MdDYxf4",
+      "isCompleted": true
     },
     {
       "name": "护士站",
@@ -55,7 +55,7 @@
       "range": [
         "护士站"
       ],
-      "clientId": "RjVRa9NkR",
+      "clientId": "lT-T9RfnM",
       "isCompleted": true
     },
     {
@@ -65,7 +65,7 @@
       "range": [
         "探视端"
       ],
-      "clientId": "RfCcuUbAq",
+      "clientId": "1xBPl_6ni",
       "isCompleted": true
     }
   ],

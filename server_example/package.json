@@ -5,9 +5,9 @@
   "description": "Simple EasyRTC server example which includes EasyRTC, Express, and Socket.io",
   "private": true,
   "scripts": {
-    "start": "node_modules/pm2/bin/pm2 start server_prod.js",
-    "stop": "node_modules/pm2/bin/pm2 stop server_prod.js",
-    "restart": "node_modules/pm2/bin/pm2 restart server_prod.js"
+    "start": "node_modules/pm2/bin/pm2 start server_dev.js",
+    "stop": "node_modules/pm2/bin/pm2 stop server_dev.js",
+    "restart": "node_modules/pm2/bin/pm2 restart server_dev.js"
   },
   "dependencies": {
     "body-parser": "^1.18.3",
