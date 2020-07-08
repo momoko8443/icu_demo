@@ -2,7 +2,7 @@
   "clients": [
     {
       "name": "1号病区",
-      "color": "#E59500",
+      "color": "#08b0c9",
       "type": "callee",
       "range": [
         "1床",
@@ -13,12 +13,12 @@
         "6床",
         "7床"
       ],
-      "clientId": "qHcv-_WaI",
+      "clientId": "cAqg07BtW",
       "isCompleted": true
     },
     {
       "name": "2号病区",
-      "color": "#840032",
+      "color": "#ffa52f",
       "type": "callee",
       "range": [
         "8床",
@@ -34,7 +34,7 @@
     },
     {
       "name": "3号病区",
-      "color": "#0063AA",
+      "color": "#cab83f",
       "type": "callee",
       "range": [
         "15床",
@@ -45,27 +45,27 @@
         "20床",
         "21床"
       ],
-      "clientId": "g5MdDYxf4",
-      "isCompleted": true
+      "clientId": "",
+      "isCompleted": false
     },
     {
       "name": "护士站",
-      "color": "#DAE78E",
+      "color": "#e3b7d5",
       "type": "caller",
       "range": [
         "护士站"
       ],
-      "clientId": "lT-T9RfnM",
-      "isCompleted": true
+      "clientId": "",
+      "isCompleted": false
     },
     {
       "name": "探视端",
       "type": "caller",
-      "color": "#B8D0EB",
+      "color": "#e3b7d5",
       "range": [
         "探视端"
       ],
-      "clientId": "1xBPl_6ni",
+      "clientId": "HSg6_Z1Y1",
       "isCompleted": true
     }
   ],
