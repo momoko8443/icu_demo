@@ -79,7 +79,13 @@ app.get('/api/clients/:name', function(req, res){
 
 app.put('/api/clients', authMiddleware,function(req, res){
     var name = req.body.name;
-    var client = icudb.setClient(name, shortid.generate())
+    var color = req.body.color;
+    if(!color){
+        res.status(400).send({
+            message: "请填写客户端配色"
+        });
+    }
+    var client = icudb.setClient(name, color,shortid.generate())
     if(client){
         res.send(client);
     }else{
@@ -101,7 +107,7 @@ app.delete('/api/clients/:id', authMiddleware, function(req, res){
     }
 });
 
-app.delete('/api/clients', authAPIMiddleware, function(req, res){
+app.delete('/api/clients', authMiddleware, function(req, res){
     icudb.removeAllClients();
     res.sendStatus(200);
 });

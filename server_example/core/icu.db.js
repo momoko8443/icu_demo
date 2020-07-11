@@ -71,8 +71,8 @@ function IcuDB() {
         }).value();
     };
 
-    this.setClient = function(name, clientId){
-        return db.get('clients').find({'name':name}).assign({ 'clientId': clientId, 'isCompleted': true }).write();
+    this.setClient = function(name, color,clientId){
+        return db.get('clients').find({'name':name}).assign({ 'color':color,'clientId': clientId, 'isCompleted': true }).write();
     };
 
     this.removeClient = function(clientId){

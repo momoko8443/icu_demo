@@ -7,13 +7,20 @@
                         <form class="pure-form">
                             <fieldset>
                                 <legend>分配客户端</legend>
-                                <select style="width: 190px;" uku-selected="cc.selectedClient|name" uku-onchange="cc.hiddenErrorMsg()">
+                                <select style="width: 190px;height:50px" uku-selected="cc.selectedClient|name" uku-onchange="cc.hiddenErrorMsg()">
                                     <option uku-repeat="client in cc.availableClients" uku-value="client.name" uku-data-item="client" uku-text="client.name"></option>
                                 </select>
+                                <legend>客户端配色</legend>
+                                <div style="display: flex;align-items: center;">
+                                    <input class="colorPicker" type="color" uku-value="cc.selectedClient.color">
+                                    <span style="margin-left:20px;color:white">{{cc.selectedClient.color}}</span>
+                                </div>
+                                
                             </fieldset>
                             <span id="errorMsg" class="errorMsg" uku-text="cc.errorMs">
                             </span>
                             <fieldset>
+                                <button type="button" class="pure-button button-error2" style="margin-right: 50px" uku-onclick="cc.clear()">重置服务器配置</a>
                                 <button type="button" class="pure-button pure-button-primary" style="margin-right: 50px" uku-onclick="cc.save()">保存</a>
                                 <button type="button" class="pure-button" uku-onclick="cc.cancel()">取消</a>
                             </fieldset>
@@ -41,9 +48,10 @@
 
                     this.save = function(){
                         var clientName = this.selectedClient.name;
+                        var clientColor = this.selectedClient.color;
                         alert(clientName);
-                        if(clientName){
-                            ajax.put('/api/clients',{name:clientName})
+                        if(clientName && clientColor){
+                            ajax.put('/api/clients',{name:clientName,color:clientColor})
                             .then(function(res){
                                 var client = res.data;
                                 localStorage.setItem('client',JSON.stringify(client));
@@ -68,6 +76,19 @@
                         this.fire('cancelchooseclient');
                     };
 
+                    this.clear = function(){
+                        ajax.delete('/api/clients')
+                        .then(function(res){
+                            localStorage.removeItem('client');
+                            self.fire('settingsdeleted');
+                        })
+                        .catch(function(err){
+                            alert(err.response.data.message);                    
+                            localStorage.removeItem('client');
+                            self.fire('settingsdeleted');
+                        });
+                    };
+
                     function getClients(){
                         ajax.get('/api/uncompleted_clients')
                         .then(function(res){
@@ -87,7 +108,13 @@
             legend{
                 color:#795548;
             }
-
+            .colorPicker{
+                width: 80px;
+                height: 50px;
+                padding: 0 !important;
+                margin: 0 !important;
+                border: 0 !important;
+            }
             .errorMsg{
                 background: red;
                 color: white;

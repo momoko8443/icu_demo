@@ -2,12 +2,12 @@
     <template>
         <div class="main" uku-ontouchend="cc.mainTouchEndHandler()">
             <div class="waiting" uku-render="cc.currentState !== 'inMeeting'">
-                <h1 class="content-subhead">
+                <div uku-render="!cc.message2" class="content-subhead">
                     {{cc.message}}
-                </h1>
-                <h1 class="content-subhead">
+                </div>
+                <div class="content-subhead2">
                     {{cc.message2}}
-                </h1>
+                </div>
             </div>
 
             <div class="videoFrame" uku-ontouchend="cc.touchEndHandler()">
@@ -534,13 +534,13 @@
                         case 'calling':
                             self.message = '正在呼叫 ' + self.otherClientName;
                             if(toName){
-                                self.message += '(' + toName + ')';
+                                self.message += toName;
                             }
                             break;
                         case 'called':
-                            self.message = self.otherClientName + ' 的来电';
+                            self.message = self.otherClientName + ' 来电';
                             if(toName){
-                                self.message += ', 呼叫 (' + toName + ')';
+                                self.message += ' 呼叫 ' + toName;
                             }
                             break;
                         case 'inMeeting':

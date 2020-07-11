@@ -2,7 +2,7 @@
 
 <html lang="en">
 <head>
-    <link rel="manifest" href="/manifest.json">
+    <!-- link rel="manifest" href="/manifest.json" -->
     <meta charset="UTF-8">
     <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
     <meta name="viewport" content="width=device-width,minimum-scale=1,maximum-scale=1,initial-scale=1,user-scalable=no" />
@@ -39,6 +39,7 @@
         uku-oncancellogin="appCtrl.cancelLoginHandler()"></login>
     <choose-client id="chooseClient" uku-render="appCtrl.currentStage === 'chooseClient'"
         uku-onsettingssaved="appCtrl.settingsSavedHandler()"
+        uku-onsettingsdeleted="appCtrl.settingsDeletedHandler()"
         uku-oncancelchooseclient="appCtrl.cancelChooseClientHandler()"></choose-client>
     <unbind-client id="unbindClient" uku-render="appCtrl.currentStage === 'unbindClient'"
         uku-client="appCtrl.client"
